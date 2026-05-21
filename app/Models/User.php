@@ -85,4 +85,13 @@ class User extends Authenticatable
     {
         return $this->hasRole('Super Admin');
     }
+
+    public function canAccessModule(string $moduleKey): bool
+    {
+        if ($this->company_id === null && $this->isSuperAdmin()) {
+            return true;
+        }
+
+        return $this->company?->hasModule($moduleKey) ?? false;
+    }
 }

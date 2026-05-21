@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\CompanyModule;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
@@ -15,7 +16,7 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request): View
     {
-        $user = $request->user()->loadMissing(['company', 'roles']);
+        $user = $request->user()->loadMissing(['company.modules', 'roles']);
 
         $foundationStats = [
             [
@@ -34,9 +35,14 @@ class DashboardController extends Controller
                 'description' => 'Default permission catalog',
             ],
             [
+                'label' => 'Module toggles',
+                'value' => CompanyModule::count(),
+                'description' => 'Company module records',
+            ],
+            [
                 'label' => 'Middleware',
-                'value' => '3 aliases',
-                'description' => 'Company, role, permission checks',
+                'value' => '4 aliases',
+                'description' => 'Company, role, permission, module checks',
             ],
         ];
 

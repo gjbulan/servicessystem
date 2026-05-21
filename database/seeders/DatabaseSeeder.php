@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SaasFoundationSeeder::class);
+        $this->call([
+            SaasFoundationSeeder::class,
+            CompanyModuleSeeder::class,
+        ]);
 
         $user = User::updateOrCreate(
             ['email' => 'test@example.com'],

@@ -16,3 +16,17 @@
 - Ran Laravel Pint successfully.
 - Ran `php artisan test`: 25 tests passed.
 - Ran SQLite `migrate:fresh --seed` verification successfully.
+- Added Phase 1.5 company module toggle foundation.
+- Added `company_modules` migration.
+- Added `CompanyModule` model and default module catalog.
+- Updated `Company` with module relationship, default module provisioning, `hasModule`, `enableModule`, and `disableModule`.
+- Updated `User` with `canAccessModule`.
+- Added `EnsureModuleEnabled` middleware and registered the `module` alias.
+- Added `CompanyModuleSeeder` and wired it into `DatabaseSeeder`.
+- Added `/settings/modules` routes, controller, and Blade view for module toggles.
+- Updated dashboard and navigation logic for module visibility.
+- Updated `UserFactory` with Phase 1 user fields.
+- Added `CompanyModuleTest` coverage for defaults, settings, toggles, middleware blocking, and Super Admin bypass.
+- Ran `php artisan test --filter=CompanyModuleTest`: 5 tests passed.
+- Ran `php artisan test`: 30 tests passed.
+- Ran SQLite `migrate:fresh --seed` verification successfully with `company_modules`.

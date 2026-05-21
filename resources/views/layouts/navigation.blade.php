@@ -1,3 +1,15 @@
+@php
+    $navigationUser = Auth::user();
+    $moduleNavigationLinks = collect([
+        ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index'],
+        ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index'],
+        ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index'],
+        ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index'],
+        ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index'],
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']));
+    $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
+@endphp
+
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,6 +27,18 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @foreach ($moduleNavigationLinks as $moduleLink)
+                        <x-nav-link :href="route($moduleLink['route'])" :active="request()->routeIs($moduleLink['route'])">
+                            {{ $moduleLink['label'] }}
+                        </x-nav-link>
+                    @endforeach
+
+                    @if ($canManageModuleSettings)
+                        <x-nav-link :href="route('settings.modules.index')" :active="request()->routeIs('settings.modules.*')">
+                            {{ __('Modules') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -70,6 +94,18 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @foreach ($moduleNavigationLinks as $moduleLink)
+                <x-responsive-nav-link :href="route($moduleLink['route'])" :active="request()->routeIs($moduleLink['route'])">
+                    {{ $moduleLink['label'] }}
+                </x-responsive-nav-link>
+            @endforeach
+
+            @if ($canManageModuleSettings)
+                <x-responsive-nav-link :href="route('settings.modules.index')" :active="request()->routeIs('settings.modules.*')">
+                    {{ __('Modules') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

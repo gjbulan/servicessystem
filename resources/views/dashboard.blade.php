@@ -61,6 +61,20 @@
                                 <p class="text-sm text-gray-500">{{ __('No roles assigned') }}</p>
                             @endforelse
                         </div>
+
+                        <div class="mt-6 border-t border-gray-200 pt-6">
+                            <h3 class="text-lg font-semibold text-gray-900">{{ __('Enabled modules') }}</h3>
+
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                @forelse ($user->company?->modules?->where('is_enabled', true)->sortBy('module_name') ?? collect() as $module)
+                                    <span class="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                                        {{ $module->module_name }}
+                                    </span>
+                                @empty
+                                    <p class="text-sm text-gray-500">{{ __('No company modules assigned') }}</p>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
                 </div>
 
