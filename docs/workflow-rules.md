@@ -32,6 +32,8 @@ Phase 3 may build sales, sale line items, payments, paid-sale stock deduction, a
 
 Phase 3.5 may build company staff management, platform user management, branch assignment for staff, inactive-login blocking, and staff dashboard totals. It must not build services, bookings, job orders, incentives, purchase orders, accounting, or subscriptions.
 
+Phase 4 may build asset types, customer assets, service categories, services, public booking, bookings, job orders, job order technicians, job order services/items, and service history. It must not build technician incentives, purchase orders, accounting, subscriptions, or advanced reports.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -131,3 +133,29 @@ Phase 3.5 may build company staff management, platform user management, branch a
 - The last Super Admin user cannot be deleted.
 - Inactive users must be blocked from logging in.
 - Staff and platform user deletes use soft deletes.
+
+## Phase 4 Service Operations Workflow
+
+- Service catalog and asset routes require `auth`, `verified`, `company.access`, `module:services`, and `permission:manage_services`.
+- Booking management routes require `auth`, `verified`, `company.access`, `module:bookings`, and `permission:manage_bookings`.
+- Job order routes require `auth`, `verified`, `company.access`, `module:job_orders`, and `permission:manage_job_orders`.
+- Public booking routes use `/book/{company:slug}` and do not require authentication.
+- Public booking must resolve an active or trial company by slug.
+- Public booking must only show active branches, asset types, and services for the resolved company.
+- Public booking submissions must create a pending booking with customer and asset snapshot fields.
+- Public booking submissions must not create an active customer record.
+- Booking confirmation must create or update a customer using phone/email.
+- Booking confirmation must create or update a customer asset from booking snapshot fields.
+- Booking confirmation must create one job order and must not duplicate job orders on repeated confirmation.
+- Booking services must copy to job order services as snapshots.
+- Customer assets replace hardcoded motorcycle-specific service logic.
+- Job orders can have multiple technicians through `job_order_technicians`.
+- Job order technician assignment must only accept active users under the same company.
+- Job order services store service snapshots and optional notes/status.
+- Job order items store item variant snapshots and are optional.
+- Job order item stock must not be deducted until completion.
+- Completing a job order must deduct inventory once through `inventory_transactions.transaction_type = job_order_usage`.
+- Completing a job order must block negative stock.
+- Completing a job order must create one `customer_asset_service_histories` record.
+- Completing a job order linked to a booking may mark the booking completed.
+- Navigation should show Asset Types, Customer Assets, Services, Service Categories, Public Booking, Bookings, and Job Orders only when the related module is enabled and the user has the required permission.

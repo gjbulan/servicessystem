@@ -49,6 +49,16 @@ class Company extends Model
         return $this->hasMany(Customer::class);
     }
 
+    public function assetTypes(): HasMany
+    {
+        return $this->hasMany(AssetType::class);
+    }
+
+    public function customerAssets(): HasMany
+    {
+        return $this->hasMany(CustomerAsset::class);
+    }
+
     public function itemCategories(): HasMany
     {
         return $this->hasMany(ItemCategory::class);
@@ -72,6 +82,31 @@ class Company extends Model
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function serviceCategories(): HasMany
+    {
+        return $this->hasMany(ServiceCategory::class);
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function jobOrders(): HasMany
+    {
+        return $this->hasMany(JobOrder::class);
+    }
+
+    public function customerAssetServiceHistories(): HasMany
+    {
+        return $this->hasMany(CustomerAssetServiceHistory::class);
     }
 
     public function roles(): HasMany

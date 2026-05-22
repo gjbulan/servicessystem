@@ -1,8 +1,9 @@
 @php
     $navigationUser = Auth::user();
     $moduleNavigationLinks = collect([
-        ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index', 'permission' => null],
-        ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index', 'permission' => null],
+        ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index', 'permission' => 'manage_services'],
+        ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index', 'permission' => 'manage_bookings'],
+        ['module' => 'job_orders', 'label' => __('Job Orders'), 'route' => 'job-orders.index', 'permission' => 'manage_job_orders'],
         ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index', 'permission' => null],
         ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index', 'permission' => 'manage_sales'],
         ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index', 'permission' => null],
@@ -21,6 +22,13 @@
         ['label' => __('Items'), 'route' => 'inventory.items.index', 'active' => 'inventory.items.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
         ['label' => __('Variants'), 'route' => 'inventory.variants.index', 'active' => 'inventory.variants.*', 'enabled' => $canUseTenantModules && $usesItemVariants && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
         ['label' => __('Stock In'), 'route' => 'inventory.stock-in.create', 'active' => 'inventory.stock-in.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
+        ['label' => __('Asset Types'), 'route' => 'asset-types.index', 'active' => 'asset-types.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('services') && $navigationUser?->hasPermission('manage_services')],
+        ['label' => __('Customer Assets'), 'route' => 'customer-assets.index', 'active' => 'customer-assets.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('services') && $navigationUser?->hasPermission('manage_services')],
+        ['label' => __('Service Categories'), 'route' => 'service-categories.index', 'active' => 'service-categories.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('services') && $navigationUser?->hasPermission('manage_services')],
+        ['label' => __('Services'), 'route' => 'services.index', 'active' => 'services.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('services') && $navigationUser?->hasPermission('manage_services')],
+        ['label' => __('Public Booking'), 'route' => 'bookings.public-info', 'active' => 'bookings.public-info', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('bookings') && $navigationUser?->hasPermission('manage_bookings')],
+        ['label' => __('Bookings'), 'route' => 'bookings.index', 'active' => 'bookings.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('bookings') && $navigationUser?->hasPermission('manage_bookings')],
+        ['label' => __('Job Orders'), 'route' => 'job-orders.index', 'active' => 'job-orders.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('job_orders') && $navigationUser?->hasPermission('manage_job_orders')],
     ])->filter(fn ($link) => $link['enabled'] && \Illuminate\Support\Facades\Route::has($link['route']));
 @endphp
 

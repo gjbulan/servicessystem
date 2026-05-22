@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -60,6 +61,16 @@ class User extends Authenticatable
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles')->withPivot('branch_id');
+    }
+
+    public function createdJobOrders(): HasMany
+    {
+        return $this->hasMany(JobOrder::class, 'created_by');
+    }
+
+    public function jobOrderTechnicianAssignments(): HasMany
+    {
+        return $this->hasMany(JobOrderTechnician::class, 'technician_id');
     }
 
     /**

@@ -57,4 +57,9 @@ class ItemVariant extends Model
     {
         return $this->hasMany(SaleItem::class);
     }
+
+    public function jobOrderItems(): HasMany
+    {
+        return $this->hasMany(JobOrderItem::class);
+    }
 }

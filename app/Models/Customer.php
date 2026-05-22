@@ -31,4 +31,24 @@ class Customer extends Model
     {
         return $this->hasMany(Sale::class);
     }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(CustomerAsset::class);
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function jobOrders(): HasMany
+    {
+        return $this->hasMany(JobOrder::class);
+    }
+
+    public function serviceHistories(): HasMany
+    {
+        return $this->hasMany(CustomerAssetServiceHistory::class);
+    }
 }

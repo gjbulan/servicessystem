@@ -14,6 +14,7 @@ class InventoryTransaction extends Model
         'damage' => 'Damage',
         'return' => 'Return',
         'sale' => 'Sale',
+        'job_order_usage' => 'Job Order Usage',
     ];
 
     public const STOCK_ENTRY_TYPES = [

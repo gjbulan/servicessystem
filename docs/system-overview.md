@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 3.5 is in progress as staff and user management on top of the completed SaaS, inventory, and sales foundations. The completed foundation includes:
+Phase 4 is in progress as service operations on top of the completed SaaS, inventory, sales, and user management foundations. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -26,6 +26,10 @@ Phase 3.5 is in progress as staff and user management on top of the completed Sa
 - Sales, sale items, payments, and receipt/invoice printing.
 - Company staff management.
 - Platform user management.
+- Asset types and customer assets.
+- Service categories and services.
+- Public booking and booking management.
+- Job orders with multiple technicians, services, items, stock usage, and service history.
 
 ## Implemented Application Areas
 
@@ -129,11 +133,25 @@ Phase 3.5 adds staff management for tenant companies and platform-level user man
 - Inactive users are blocked from logging in.
 - Dashboard cards show staff totals for company users and platform user totals for Super Admin users.
 
+## Phase 4 Service Operations
+
+Phase 4 adds service workflows for motoshops, solar service, repair shops, and other companies that need customer-owned asset service records.
+
+- Asset types are tenant-defined, so the system avoids hardcoded motorcycle-only assumptions.
+- Customer assets belong to customers and can represent motorcycles, vehicles, solar systems, equipment, devices, or other tenant-defined assets.
+- Service categories and services provide a tenant service catalog.
+- Public booking uses `/book/{company:slug}` and stores customer, asset, and service snapshots without requiring customer registration.
+- Booking confirmation creates or updates a customer, creates or updates a customer asset, and creates a job order.
+- Job orders support multiple technician assignments.
+- Job orders can store performed services and optional inventory items used.
+- Inventory items are deducted only when a job order is completed.
+- Job order completion writes `inventory_transactions` with `transaction_type = job_order_usage`.
+- Job order completion creates a customer asset service history record.
+
 The following modules remain intentionally out of scope:
 
-- Services.
-- Bookings.
-- Job orders.
 - Technician incentives.
 - Purchase orders.
 - Accounting.
+- Subscriptions.
+- Advanced reports.

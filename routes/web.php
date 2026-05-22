@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CompanyModuleController;
 use App\Http\Controllers\CustomerController;
@@ -12,14 +13,23 @@ use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\Inventory\ItemVariantController;
 use App\Http\Controllers\Inventory\StockInController;
 use App\Http\Controllers\InventorySettingController;
+use App\Http\Controllers\JobOrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicBookingController;
 use App\Http\Controllers\Sales\SaleController;
+use App\Http\Controllers\Services\AssetTypeController;
+use App\Http\Controllers\Services\CustomerAssetController;
+use App\Http\Controllers\Services\ServiceCategoryController;
+use App\Http\Controllers\Services\ServiceController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/book/{company:slug}', [PublicBookingController::class, 'create'])->name('public-bookings.create');
+Route::post('/book/{company:slug}', [PublicBookingController::class, 'store'])->name('public-bookings.store');
 
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
@@ -81,6 +91,43 @@ Route::middleware(['auth', 'verified', 'company.access'])->group(function () {
                 ->parameters(['variants' => 'variant']);
             Route::get('/stock-in', [StockInController::class, 'create'])->name('stock-in.create');
             Route::post('/stock-in', [StockInController::class, 'store'])->name('stock-in.store');
+        });
+
+    Route::middleware(['module:services', 'permission:manage_services'])
+        ->group(function () {
+            Route::resource('asset-types', AssetTypeController::class)
+                ->parameters(['asset-types' => 'assetType']);
+            Route::resource('customer-assets', CustomerAssetController::class)
+                ->parameters(['customer-assets' => 'customerAsset']);
+            Route::resource('service-categories', ServiceCategoryController::class)
+                ->parameters(['service-categories' => 'serviceCategory']);
+            Route::resource('services', ServiceController::class);
+        });
+
+    Route::middleware(['module:bookings', 'permission:manage_bookings'])
+        ->prefix('bookings')
+        ->name('bookings.')
+        ->group(function () {
+            Route::get('/', [BookingController::class, 'index'])->name('index');
+            Route::get('/public-info', [BookingController::class, 'publicInfo'])->name('public-info');
+            Route::get('/{booking}', [BookingController::class, 'show'])->name('show');
+            Route::post('/{booking}/confirm', [BookingController::class, 'confirm'])->name('confirm');
+            Route::post('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
+            Route::post('/{booking}/no-show', [BookingController::class, 'noShow'])->name('no-show');
+        });
+
+    Route::middleware(['module:job_orders', 'permission:manage_job_orders'])
+        ->prefix('job-orders')
+        ->name('job-orders.')
+        ->group(function () {
+            Route::get('/', [JobOrderController::class, 'index'])->name('index');
+            Route::get('/{jobOrder}', [JobOrderController::class, 'show'])->name('show');
+            Route::get('/{jobOrder}/edit', [JobOrderController::class, 'edit'])->name('edit');
+            Route::match(['put', 'patch'], '/{jobOrder}', [JobOrderController::class, 'update'])->name('update');
+            Route::get('/{jobOrder}/assign-technicians', [JobOrderController::class, 'assignTechnicians'])->name('assign-technicians');
+            Route::post('/{jobOrder}/assign-technicians', [JobOrderController::class, 'updateTechnicians'])->name('technicians.update');
+            Route::post('/{jobOrder}/complete', [JobOrderController::class, 'complete'])->name('complete');
+            Route::post('/{jobOrder}/cancel', [JobOrderController::class, 'cancel'])->name('cancel');
         });
 
     Route::middleware(['module:sales', 'permission:manage_sales'])

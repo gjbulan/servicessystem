@@ -92,14 +92,23 @@ Default module keys:
 - A company has many company modules.
 - A company has many branches.
 - A company has many customers.
+- A company has many asset types.
+- A company has many customer assets.
 - A company has many item categories.
 - A company has many item brands.
 - A company has many items.
 - A company has many item variants.
 - A company has many sales.
+- A company has many service categories.
+- A company has many services.
+- A company has many bookings.
+- A company has many job orders.
+- A company has many customer asset service histories.
 - A company has one inventory setting.
 - A user belongs to one company.
 - A user belongs to many roles through `user_roles`.
+- A user can create many job orders.
+- A user can be assigned to many job orders as a technician.
 - A role belongs to one company.
 - A role belongs to many users through `user_roles`.
 - A role belongs to many permissions through `role_permissions`.
@@ -109,8 +118,18 @@ Default module keys:
 - A branch has many branch item variant stocks.
 - A branch has many inventory transactions.
 - A branch has many sales.
+- A branch has many bookings.
+- A branch has many job orders.
+- A branch has many customer asset service histories.
 - A customer belongs to one company.
 - A customer has many sales.
+- A customer has many customer assets.
+- A customer has many bookings.
+- A customer has many job orders.
+- A customer has many service histories.
+- An asset type belongs to one company and has many customer assets.
+- A customer asset belongs to one company, customer, and optional asset type.
+- A customer asset has many bookings, job orders, and service histories.
 - An item category belongs to one company and has many items.
 - An item brand belongs to one company and has many items.
 - An item belongs to one company, category, and brand.
@@ -119,6 +138,7 @@ Default module keys:
 - An item variant has many branch stock records.
 - An item variant has many inventory transactions.
 - An item variant has many sale items.
+- An item variant has many job order items.
 - A branch item variant stock belongs to one company, branch, and item variant.
 - An inventory transaction belongs to one company, branch, item variant, and creator user.
 - A company inventory setting belongs to one company.
@@ -126,6 +146,18 @@ Default module keys:
 - A sale has many sale items and sale payments.
 - A sale item belongs to one company, sale, and item variant.
 - A sale payment belongs to one company, sale, and receiver user.
+- A service category belongs to one company and has many services.
+- A service belongs to one company and optional service category.
+- A service has many booking service and job order service rows.
+- A booking belongs to one company, branch, optional customer, and optional customer asset.
+- A booking has many booking services and one job order.
+- A booking service belongs to one booking and service.
+- A job order belongs to one company, branch, customer, optional booking, optional customer asset, and optional creator user.
+- A job order has many technicians, services, items, and one service history.
+- A job order technician belongs to one job order and one user.
+- A job order service belongs to one job order and optional service.
+- A job order item belongs to one job order and optional item variant.
+- A customer asset service history belongs to one company, branch, customer, optional customer asset, and job order.
 
 ## Phase 1.6 Company Management
 
@@ -267,6 +299,7 @@ Allowed transaction types:
 - `damage`
 - `return`
 - `sale`
+- `job_order_usage`
 
 The stock-in page displays the latest tenant-scoped inventory transactions newest first.
 
@@ -364,3 +397,175 @@ Staff role and branch assignment:
 - Company staff management supports only one role and one branch assignment per user for now.
 
 Soft-deleted users are excluded from normal staff and platform user lists.
+
+## Phase 4 Service Operations
+
+### `asset_types`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `name`
+- `description` nullable
+- `status` string: `active` or `inactive`; default `active`
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- index on `company_id`, `status`
+
+Asset types replace hardcoded motorcycle assumptions with tenant-defined assets such as Motorcycle, Solar System, Equipment, Vehicle, or Device.
+
+### `customer_assets`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `customer_id` foreign key to `customers.id`, cascades on hard delete
+- `asset_type_id` nullable foreign key to `asset_types.id`, nulls on delete
+- `name` nullable
+- `brand` nullable
+- `model` nullable
+- `year` nullable
+- `serial_number` nullable
+- `plate_number` nullable
+- `color` nullable
+- `notes` nullable
+- `status` string: `active` or `inactive`; default `active`
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- indexes on `company_id`, `customer_id` and `company_id`, `status`
+
+Customers can have multiple assets.
+
+### `service_categories`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `name`
+- `description` nullable
+- `status` string: `active` or `inactive`; default `active`
+- `sort_order` nullable
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+
+### `services`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `service_category_id` nullable foreign key to `service_categories.id`, nulls on delete
+- `name`
+- `description` nullable
+- `default_price` decimal(12,2), default `0`
+- `estimated_duration_minutes` nullable unsigned integer
+- `default_incentive_amount` nullable decimal(12,2)
+- `status` string: `active` or `inactive`; default `active`
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+
+`default_incentive_amount` is stored for later phases only. Phase 4 does not calculate technician incentives.
+
+### `bookings`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` foreign key to `branches.id`, cascades on hard delete
+- `booking_reference`
+- `customer_id` nullable foreign key to `customers.id`, nulls on delete
+- `customer_asset_id` nullable foreign key to `customer_assets.id`, nulls on delete
+- `customer_name`
+- `phone`
+- `email` nullable
+- `asset_type_name` nullable
+- `asset_details_json` nullable JSON
+- `preferred_datetime` nullable datetime
+- `issue_description` nullable
+- `lead_source` nullable
+- `status` string: `pending`, `confirmed`, `no_show`, `in_progress`, `completed`, `cancelled`; default `pending`
+- `internal_notes` nullable
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- unique index on `company_id`, `booking_reference`
+
+Public bookings store customer and asset snapshot details. They do not create a customer until confirmed.
+
+### `booking_services`
+
+- `id`
+- `booking_id` foreign key to `bookings.id`, cascades on delete
+- `service_id` foreign key to `services.id`, cascades on delete
+- `service_name_snapshot`
+- `price_snapshot` decimal(12,2)
+- `created_at`, `updated_at`
+
+### `job_orders`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` foreign key to `branches.id`, cascades on hard delete
+- `booking_id` nullable foreign key to `bookings.id`, nulls on delete
+- `customer_id` foreign key to `customers.id`, cascades on hard delete
+- `customer_asset_id` nullable foreign key to `customer_assets.id`, nulls on delete
+- `job_order_number`
+- `status` string: `open`, `checked_in`, `in_progress`, `waiting_approval`, `waiting_parts`, `completed`, `cancelled`; default `open`
+- `customer_complaint` nullable
+- `inspection_notes` nullable
+- `internal_notes` nullable
+- `approval_status` nullable
+- `approval_notes` nullable
+- `started_at` nullable
+- `completed_at` nullable
+- `created_by` nullable foreign key to `users.id`, nulls on delete
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- unique index on `company_id`, `job_order_number`
+
+### `job_order_technicians`
+
+- `id`
+- `job_order_id` foreign key to `job_orders.id`, cascades on delete
+- `technician_id` foreign key to `users.id`, cascades on delete
+- `role` nullable
+- `is_primary` boolean, default `false`
+- `notes` nullable
+- `created_at`, `updated_at`
+- unique index on `job_order_id`, `technician_id`
+
+### `job_order_services`
+
+- `id`
+- `job_order_id` foreign key to `job_orders.id`, cascades on delete
+- `service_id` nullable foreign key to `services.id`, nulls on delete
+- `service_name_snapshot`
+- `price_snapshot` decimal(12,2)
+- `notes` nullable
+- `status` nullable
+- `created_at`, `updated_at`
+
+### `job_order_items`
+
+- `id`
+- `job_order_id` foreign key to `job_orders.id`, cascades on delete
+- `item_variant_id` nullable foreign key to `item_variants.id`, nulls on delete
+- `item_name_snapshot`
+- `variant_name_snapshot` nullable
+- `sku_snapshot` nullable
+- `quantity` decimal(12,2)
+- `cost_price_snapshot` decimal(12,2)
+- `selling_price_snapshot` decimal(12,2)
+- `notes` nullable
+- `created_at`, `updated_at`
+
+Job order item stock is deducted only when the job order is completed.
+
+### `customer_asset_service_histories`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` foreign key to `branches.id`, cascades on hard delete
+- `customer_id` foreign key to `customers.id`, cascades on hard delete
+- `customer_asset_id` nullable foreign key to `customer_assets.id`, nulls on delete
+- `job_order_id` foreign key to `job_orders.id`, cascades on delete
+- `service_summary`
+- `service_date`
+- `notes` nullable
+- `created_at`, `updated_at`
+- unique index on `job_order_id`
+
+One service history record is generated when a job order is completed.

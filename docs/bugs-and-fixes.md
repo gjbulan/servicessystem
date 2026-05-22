@@ -39,3 +39,10 @@
 - Added `StaffUserManagementTest` coverage for inactive login blocking.
 - `php artisan test --filter=StaffUserManagementTest` passed with 8 tests.
 - `php artisan test` passed with 58 tests.
+
+## 2026-05-22 Phase 4
+
+- No Phase 4 service operations bugs were found during focused verification.
+- `vendor\bin\pint` passed.
+- `php artisan test --filter=ServiceOperationsTest` passed with 7 tests.
+- `php artisan test` passed with 65 tests.

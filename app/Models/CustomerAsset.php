@@ -7,19 +7,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Branch extends Model
+class CustomerAsset extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         'company_id',
+        'customer_id',
+        'asset_type_id',
         'name',
-        'code',
-        'email',
-        'phone',
-        'address',
-        'manager_name',
-        'operating_hours',
+        'brand',
+        'model',
+        'year',
+        'serial_number',
+        'plate_number',
+        'color',
+        'notes',
         'status',
     ];
 
@@ -28,19 +31,14 @@ class Branch extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function stocks(): HasMany
+    public function customer(): BelongsTo
     {
-        return $this->hasMany(BranchItemVariantStock::class);
+        return $this->belongsTo(Customer::class);
     }
 
-    public function inventoryTransactions(): HasMany
+    public function assetType(): BelongsTo
     {
-        return $this->hasMany(InventoryTransaction::class);
-    }
-
-    public function sales(): HasMany
-    {
-        return $this->hasMany(Sale::class);
+        return $this->belongsTo(AssetType::class);
     }
 
     public function bookings(): HasMany
@@ -53,7 +51,7 @@ class Branch extends Model
         return $this->hasMany(JobOrder::class);
     }
 
-    public function customerAssetServiceHistories(): HasMany
+    public function serviceHistories(): HasMany
     {
         return $this->hasMany(CustomerAssetServiceHistory::class);
     }

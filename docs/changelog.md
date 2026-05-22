@@ -99,3 +99,18 @@
 - Ran Laravel Pint successfully.
 - Ran `php artisan test --filter=StaffUserManagementTest`: 8 tests passed.
 - Ran `php artisan test`: 58 tests passed.
+- Added Phase 4 service operations.
+- Added service operations migration for asset types, customer assets, service categories, services, bookings, booking services, job orders, job order technicians, job order services, job order items, and service history.
+- Added Phase 4 models and relationships across companies, branches, customers, users, item variants, bookings, job orders, and service history.
+- Added public booking routes at `/book/{company:slug}` for unauthenticated booking requests.
+- Added booking management routes for listing, viewing, confirming, cancelling, and marking no-show bookings.
+- Added job order routes for listing, viewing, editing, assigning technicians, completing, and cancelling job orders.
+- Added CRUD routes and views for asset types, customer assets, service categories, and services.
+- Added job order completion stock deduction with `inventory_transactions.transaction_type = job_order_usage`.
+- Added idempotency checks so repeated job order completion does not double-deduct stock.
+- Added service history generation on job order completion.
+- Updated navigation and sidebar links for service operations modules.
+- Added `ServiceOperationsTest` coverage for public booking, booking confirmation, customer/asset/job-order creation, multiple technicians, idempotent stock deduction, service history, and tenant safety.
+- Ran Laravel Pint successfully.
+- Ran `php artisan test --filter=ServiceOperationsTest`: 7 tests passed.
+- Ran `php artisan test`: 65 tests passed.
