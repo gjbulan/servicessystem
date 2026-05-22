@@ -44,6 +44,42 @@
         <textarea id="description" name="description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description', $item->description) }}</textarea>
         <x-input-error class="mt-2" :messages="$errors->get('description')" />
     </div>
+
+    @unless ($usesItemVariants)
+        <div class="md:col-span-2 border-t border-gray-200 pt-6">
+            <h3 class="text-base font-semibold text-gray-900">{{ __('Inventory Details') }}</h3>
+        </div>
+
+        <div>
+            <x-input-label for="sku" :value="__('SKU')" />
+            <x-text-input id="sku" name="sku" type="text" class="mt-1 block w-full" :value="old('sku', $defaultVariant->sku)" />
+            <x-input-error class="mt-2" :messages="$errors->get('sku')" />
+        </div>
+
+        <div>
+            <x-input-label for="barcode" :value="__('Barcode')" />
+            <x-text-input id="barcode" name="barcode" type="text" class="mt-1 block w-full" :value="old('barcode', $defaultVariant->barcode)" />
+            <x-input-error class="mt-2" :messages="$errors->get('barcode')" />
+        </div>
+
+        <div>
+            <x-input-label for="cost_price" :value="__('Cost price')" />
+            <x-text-input id="cost_price" name="cost_price" type="number" min="0" step="0.01" class="mt-1 block w-full" :value="old('cost_price', $defaultVariant->cost_price)" required />
+            <x-input-error class="mt-2" :messages="$errors->get('cost_price')" />
+        </div>
+
+        <div>
+            <x-input-label for="selling_price" :value="__('Selling price')" />
+            <x-text-input id="selling_price" name="selling_price" type="number" min="0" step="0.01" class="mt-1 block w-full" :value="old('selling_price', $defaultVariant->selling_price)" required />
+            <x-input-error class="mt-2" :messages="$errors->get('selling_price')" />
+        </div>
+
+        <div>
+            <x-input-label for="unit_type" :value="__('Unit type')" />
+            <x-text-input id="unit_type" name="unit_type" type="text" class="mt-1 block w-full" :value="old('unit_type', $defaultVariant->unit_type)" placeholder="pcs, liter, set" />
+            <x-input-error class="mt-2" :messages="$errors->get('unit_type')" />
+        </div>
+    @endunless
 </div>
 
 <div class="mt-6 flex items-center gap-3">

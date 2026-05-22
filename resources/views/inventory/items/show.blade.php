@@ -1,4 +1,93 @@
 <x-app-layout>
-    <x-slot name="header"><div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $item->name }}</h2><a href="{{ route('inventory.items.edit', $item) }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">{{ __('Edit') }}</a></div></x-slot>
-    <div class="py-12"><div class="max-w-5xl mx-auto space-y-6 sm:px-6 lg:px-8">@if (session('status'))<div class="bg-white p-4 text-sm font-medium text-green-700 shadow-sm sm:rounded-lg">{{ session('status') }}</div>@endif<section class="bg-white shadow-sm sm:rounded-lg"><div class="grid gap-6 p-6 md:grid-cols-2"><div><p class="text-sm text-gray-500">{{ __('Brand') }}</p><p class="font-medium text-gray-900">{{ $item->brand?->name ?? __('None') }}</p></div><div><p class="text-sm text-gray-500">{{ __('Category') }}</p><p class="font-medium text-gray-900">{{ $item->category?->name ?? __('None') }}</p></div><div><p class="text-sm text-gray-500">{{ __('Status') }}</p><p class="font-medium text-gray-900">{{ $statuses[$item->status] ?? ucfirst($item->status) }}</p></div><div class="md:col-span-2"><p class="text-sm text-gray-500">{{ __('Description') }}</p><p class="font-medium text-gray-900">{{ $item->description ?? __('Not set') }}</p></div></div></section><section class="bg-white shadow-sm sm:rounded-lg"><div class="border-b border-gray-200 p-6"><h3 class="text-lg font-semibold text-gray-900">{{ __('Variants') }}</h3></div><div class="divide-y divide-gray-100">@forelse ($item->variants as $variant)<div class="p-6"><a href="{{ route('inventory.variants.show', $variant) }}" class="font-medium text-gray-900 hover:text-gray-700">{{ $variant->variant_name }}</a><p class="mt-1 text-sm text-gray-500">{{ $variant->sku ?? __('No SKU') }}</p></div>@empty<div class="p-6 text-sm text-gray-500">{{ __('No variants yet.') }}</div>@endforelse</div></section><section class="bg-white shadow-sm sm:rounded-lg"><div class="p-6"><form method="POST" action="{{ route('inventory.items.destroy', $item) }}" onsubmit="return confirm('{{ __('Delete this item?') }}')">@csrf @method('DELETE')<x-danger-button>{{ __('Delete Item') }}</x-danger-button></form></div></section></div></div>
+    <x-slot name="header">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $item->name }}</h2>
+            <a href="{{ route('inventory.items.edit', $item) }}" class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">{{ __('Edit') }}</a>
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-5xl mx-auto space-y-6 sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="bg-white p-4 text-sm font-medium text-green-700 shadow-sm sm:rounded-lg">{{ session('status') }}</div>
+            @endif
+
+            <section class="bg-white shadow-sm sm:rounded-lg">
+                <div class="grid gap-6 p-6 md:grid-cols-2">
+                    <div>
+                        <p class="text-sm text-gray-500">{{ __('Brand') }}</p>
+                        <p class="font-medium text-gray-900">{{ $item->brand?->name ?? __('None') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">{{ __('Category') }}</p>
+                        <p class="font-medium text-gray-900">{{ $item->category?->name ?? __('None') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">{{ __('Status') }}</p>
+                        <p class="font-medium text-gray-900">{{ $statuses[$item->status] ?? ucfirst($item->status) }}</p>
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-sm text-gray-500">{{ __('Description') }}</p>
+                        <p class="font-medium text-gray-900">{{ $item->description ?? __('Not set') }}</p>
+                    </div>
+                </div>
+            </section>
+
+            @if ($usesItemVariants)
+                <section class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="border-b border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Variants') }}</h3>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        @forelse ($item->variants as $variant)
+                            <div class="p-6">
+                                <a href="{{ route('inventory.variants.show', $variant) }}" class="font-medium text-gray-900 hover:text-gray-700">{{ $variant->variant_name }}</a>
+                                <p class="mt-1 text-sm text-gray-500">{{ $variant->sku ?? __('No SKU') }}</p>
+                            </div>
+                        @empty
+                            <div class="p-6 text-sm text-gray-500">{{ __('No variants yet.') }}</div>
+                        @endforelse
+                    </div>
+                </section>
+            @else
+                <section class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="border-b border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Inventory Details') }}</h3>
+                    </div>
+                    <div class="grid gap-6 p-6 md:grid-cols-3">
+                        <div>
+                            <p class="text-sm text-gray-500">{{ __('SKU') }}</p>
+                            <p class="font-medium text-gray-900">{{ $item->defaultVariant?->sku ?? __('Not set') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">{{ __('Barcode') }}</p>
+                            <p class="font-medium text-gray-900">{{ $item->defaultVariant?->barcode ?? __('Not set') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">{{ __('Unit') }}</p>
+                            <p class="font-medium text-gray-900">{{ $item->defaultVariant?->unit_type ?? __('Not set') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">{{ __('Cost') }}</p>
+                            <p class="font-medium text-gray-900">{{ number_format((float) ($item->defaultVariant?->cost_price ?? 0), 2) }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">{{ __('Selling') }}</p>
+                            <p class="font-medium text-gray-900">{{ number_format((float) ($item->defaultVariant?->selling_price ?? 0), 2) }}</p>
+                        </div>
+                    </div>
+                </section>
+            @endif
+
+            <section class="bg-white shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <form method="POST" action="{{ route('inventory.items.destroy', $item) }}" onsubmit="return confirm('{{ __('Delete this item?') }}')">
+                        @csrf
+                        @method('DELETE')
+                        <x-danger-button>{{ __('Delete Item') }}</x-danger-button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
 </x-app-layout>

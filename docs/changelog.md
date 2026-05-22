@@ -58,3 +58,15 @@
 - Ran Laravel Pint successfully.
 - Ran `php artisan test --filter=InventoryTransactionHistoryTest`: 1 test passed.
 - Ran `php artisan test`: 39 tests passed.
+- Added Phase 2.5 optional inventory variant mode.
+- Added `company_inventory_settings` migration and `CompanyInventorySetting` model.
+- Added `Company::usesItemVariants()` and default inventory setting creation for new companies.
+- Added `CompanyInventorySettingSeeder` and wired it into `DatabaseSeeder`.
+- Added `/settings/inventory` UI for toggling item variants.
+- Updated item create and edit flows to create or update a hidden `Default` variant when variants are disabled.
+- Updated item list/detail displays to show SKU, barcode, price, and unit fields from the default variant in simple mode.
+- Updated stock-in labels and validation so simple mode displays items while still using `item_variant_id`.
+- Updated navigation to hide the Variants link when item variants are disabled.
+- Added `OptionalVariantModeTest` coverage for defaults, navigation, default variant creation/update, and stock-in.
+- Ran `php artisan test --filter=OptionalVariantModeTest`: 5 tests passed.
+- Ran `php artisan test`: 44 tests passed.

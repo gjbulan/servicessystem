@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Item extends Model
@@ -38,5 +39,10 @@ class Item extends Model
     public function variants(): HasMany
     {
         return $this->hasMany(ItemVariant::class);
+    }
+
+    public function defaultVariant(): HasOne
+    {
+        return $this->hasOne(ItemVariant::class)->where('variant_name', 'Default');
     }
 }

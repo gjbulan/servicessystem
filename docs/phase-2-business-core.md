@@ -131,6 +131,19 @@ Variants are the actual inventory units. Examples:
 
 Stock is tracked per branch and variant in `branch_item_variant_stocks`.
 
+## Phase 2.5 Optional Variant Mode
+
+Phase 2.5 adds a company inventory setting so simple-inventory companies can hide the separate Variants workflow while the database remains variant-based.
+
+- `company_inventory_settings.enable_item_variants` controls the UI mode.
+- Variant mode defaults to enabled for existing and new companies.
+- When variants are enabled, users create variants separately.
+- When variants are disabled, item create and edit forms show SKU, barcode, prices, and unit type.
+- When variants are disabled, the system creates or updates one hidden `Default` variant for each item.
+- Stock In continues to use `item_variant_id` internally.
+- Stock In displays item labels instead of variant labels when variants are disabled.
+- The Variants navigation link is hidden when variants are disabled.
+
 ## Stock Transaction Flow
 
 The stock-in screen records inventory movements through `/inventory/stock-in`.
@@ -177,3 +190,4 @@ Links only display when the user has the required permission and the related mod
 
 - `php artisan test --filter=InventoryTransactionHistoryTest`: 1 test passed.
 - `php artisan test`: 39 tests passed.
+- `php artisan test --filter=OptionalVariantModeTest`: 5 tests passed.

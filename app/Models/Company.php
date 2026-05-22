@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Schema;
 
@@ -25,6 +26,10 @@ class Company extends Model
         static::created(function (Company $company): void {
             if (Schema::hasTable('company_modules')) {
                 $company->ensureDefaultModules();
+            }
+
+            if (Schema::hasTable('company_inventory_settings')) {
+                $company->ensureDefaultInventorySetting();
             }
         });
     }
@@ -74,6 +79,11 @@ class Company extends Model
         return $this->hasMany(CompanyModule::class);
     }
 
+    public function inventorySetting(): HasOne
+    {
+        return $this->hasOne(CompanyInventorySetting::class);
+    }
+
     public function hasModule(string $moduleKey): bool
     {
         return $this->modules()
@@ -108,6 +118,24 @@ class Company extends Model
 
             $module->save();
         }
+    }
+
+    public function ensureDefaultInventorySetting(): CompanyInventorySetting
+    {
+        return $this->inventorySetting()->firstOrCreate([
+            'company_id' => $this->id,
+        ], [
+            'enable_item_variants' => true,
+        ]);
+    }
+
+    public function usesItemVariants(): bool
+    {
+        if (! Schema::hasTable('company_inventory_settings')) {
+            return true;
+        }
+
+        return $this->ensureDefaultInventorySetting()->enable_item_variants;
     }
 
     private function setModuleEnabled(string $moduleKey, bool $isEnabled): CompanyModule

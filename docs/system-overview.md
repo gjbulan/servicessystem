@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 2 is in progress as the business core foundation. The completed foundation includes:
+Phase 2.5 is in progress as an inventory usability extension on top of the completed business core foundation. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -22,6 +22,7 @@ Phase 2 is in progress as the business core foundation. The completed foundation
 - Customers.
 - Inventory catalog foundation.
 - Branch stock and inventory transactions.
+- Optional inventory variant mode.
 
 ## Implemented Application Areas
 
@@ -82,6 +83,19 @@ Phase 2 adds tenant business records that can be reused by motoshops, inventory 
 - The stock-in page creates stock transactions and shows recent transaction history for the authenticated user's company.
 
 Phase 2 routes are tenant scoped by `company_id` and protected by the existing permission and module middleware.
+
+## Phase 2.5 Optional Variant Mode
+
+Phase 2.5 adds company-level inventory settings for simple and variant-heavy businesses.
+
+- `company_inventory_settings` stores whether a company uses item variants.
+- `Company::usesItemVariants()` exposes the setting to controllers and views.
+- Variant mode defaults to enabled for existing and new companies.
+- When variants are disabled, the item form collects SKU, barcode, prices, and unit type.
+- When variants are disabled, each item automatically receives one hidden `Default` variant.
+- Stock, branch stock, and inventory transactions continue to use `item_variant_id` internally.
+- The Variants navigation link is hidden when variants are disabled.
+- Stock In shows item labels instead of variant labels when variants are disabled.
 
 The following modules remain intentionally out of scope:
 

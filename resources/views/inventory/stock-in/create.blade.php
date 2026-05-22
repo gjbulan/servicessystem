@@ -25,12 +25,16 @@
                     </div>
 
                     <div>
-                        <x-input-label for="item_variant_id" :value="__('Item variant')" />
+                        <x-input-label for="item_variant_id" :value="$usesItemVariants ? __('Item variant') : __('Item')" />
                         <select id="item_variant_id" name="item_variant_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                            <option value="">{{ __('Select variant') }}</option>
+                            <option value="">{{ $usesItemVariants ? __('Select variant') : __('Select item') }}</option>
                             @foreach ($variants as $variant)
                                 <option value="{{ $variant->id }}" @selected((int) old('item_variant_id') === $variant->id)>
-                                    {{ $variant->item?->brand?->name ? $variant->item->brand->name.' - ' : '' }}{{ $variant->item?->name }} - {{ $variant->variant_name }}{{ $variant->sku ? ' ('.$variant->sku.')' : '' }}
+                                    @if ($usesItemVariants)
+                                        {{ $variant->item?->brand?->name ? $variant->item->brand->name.' - ' : '' }}{{ $variant->item?->name }} - {{ $variant->variant_name }}{{ $variant->sku ? ' ('.$variant->sku.')' : '' }}
+                                    @else
+                                        {{ $variant->item?->brand?->name ? $variant->item->brand->name.' - ' : '' }}{{ $variant->item?->name }}{{ $variant->sku ? ' ('.$variant->sku.')' : '' }}
+                                    @endif
                                 </option>
                             @endforeach
                         </select>
@@ -94,7 +98,13 @@
                                     <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transaction->created_at?->format('M d, Y h:i A') }}</td>
                                     <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transaction->branch?->name ?? __('Archived branch') }}</td>
                                     <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transaction->itemVariant?->item?->name ?? __('Archived item') }}</td>
-                                    <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transaction->itemVariant?->variant_name ?? __('Archived variant') }}</td>
+                                    <td class="whitespace-nowrap px-4 py-3 text-gray-700">
+                                        @if ($usesItemVariants)
+                                            {{ $transaction->itemVariant?->variant_name ?? __('Archived variant') }}
+                                        @else
+                                            {{ $transaction->itemVariant?->variant_name && $transaction->itemVariant->variant_name !== 'Default' ? $transaction->itemVariant->variant_name : '-' }}
+                                        @endif
+                                    </td>
                                     <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transaction->itemVariant?->sku ?: '-' }}</td>
                                     <td class="whitespace-nowrap px-4 py-3 text-gray-700">{{ $transactionTypes[$transaction->transaction_type] ?? str($transaction->transaction_type)->headline() }}</td>
                                     <td class="whitespace-nowrap px-4 py-3 text-right text-gray-700">{{ number_format((float) $transaction->quantity, 2) }}</td>

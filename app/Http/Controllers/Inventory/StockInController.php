@@ -22,6 +22,16 @@ class StockInController extends Controller
     public function create(Request $request): View
     {
         $company = $this->tenantCompany($request);
+        $usesItemVariants = $company->usesItemVariants();
+
+        $variants = ItemVariant::query()
+            ->with(['item.brand', 'item.category'])
+            ->where('company_id', $company->id)
+            ->where('status', 'active')
+            ->when(! $usesItemVariants, fn ($query) => $query->where('variant_name', 'Default'))
+            ->get()
+            ->sortBy(fn (ItemVariant $variant) => strtolower(($variant->item?->name ?? '').' '.$variant->variant_name))
+            ->values();
 
         return view('inventory.stock-in.create', [
             'branches' => Branch::query()
@@ -30,12 +40,8 @@ class StockInController extends Controller
                 ->orderBy('name')
                 ->get(),
             'transactionTypes' => InventoryTransaction::TYPES,
-            'variants' => ItemVariant::query()
-                ->with(['item.brand', 'item.category'])
-                ->where('company_id', $company->id)
-                ->where('status', 'active')
-                ->orderBy('variant_name')
-                ->get(),
+            'usesItemVariants' => $usesItemVariants,
+            'variants' => $variants,
             'recentTransactions' => InventoryTransaction::query()
                 ->with([
                     'branch' => fn ($query) => $query->withTrashed(),
@@ -55,6 +61,7 @@ class StockInController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $company = $this->tenantCompany($request);
+        $usesItemVariants = $company->usesItemVariants();
 
         $data = $request->validate([
             'branch_id' => ['required', Rule::exists('branches', 'id')->where('company_id', $company->id)],
@@ -63,6 +70,16 @@ class StockInController extends Controller
             'quantity' => ['required', 'numeric', 'gt:0', 'max:9999999999.99'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        if (! $usesItemVariants && ! ItemVariant::query()
+            ->where('company_id', $company->id)
+            ->where('variant_name', 'Default')
+            ->whereKey($data['item_variant_id'])
+            ->exists()) {
+            throw ValidationException::withMessages([
+                'item_variant_id' => 'Select a valid item.',
+            ]);
+        }
 
         DB::transaction(function () use ($company, $data, $request): void {
             $stock = BranchItemVariantStock::query()

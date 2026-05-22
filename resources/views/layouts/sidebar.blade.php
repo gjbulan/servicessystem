@@ -1,6 +1,7 @@
 @php
     $sidebarUser = Auth::user();
     $canUseCompanyModules = $sidebarUser && $sidebarUser->company_id !== null;
+    $usesItemVariants = $canUseCompanyModules && $sidebarUser->company?->usesItemVariants();
     $branchLinks = collect([
         ['label' => __('Branches'), 'route' => 'branches.index', 'active' => 'branches.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->hasPermission('manage_branches'));
@@ -11,9 +12,9 @@
         ['label' => __('Categories'), 'route' => 'inventory.categories.index', 'active' => 'inventory.categories.*'],
         ['label' => __('Brands'), 'route' => 'inventory.brands.index', 'active' => 'inventory.brands.*'],
         ['label' => __('Items'), 'route' => 'inventory.items.index', 'active' => 'inventory.items.*'],
-        ['label' => __('Variants'), 'route' => 'inventory.variants.index', 'active' => 'inventory.variants.*'],
+        ['label' => __('Variants'), 'route' => 'inventory.variants.index', 'active' => 'inventory.variants.*', 'requires_variants' => true],
         ['label' => __('Stock In'), 'route' => 'inventory.stock-in.create', 'active' => 'inventory.stock-in.*'],
-    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('inventory') && $sidebarUser->hasPermission('manage_inventory'));
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('inventory') && $sidebarUser->hasPermission('manage_inventory') && (! ($link['requires_variants'] ?? false) || $usesItemVariants));
 @endphp
 
 @if ($branchLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())

@@ -10,6 +10,7 @@ use App\Http\Controllers\Inventory\ItemCategoryController;
 use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\Inventory\ItemVariantController;
 use App\Http\Controllers\Inventory\StockInController;
+use App\Http\Controllers\InventorySettingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,8 @@ Route::middleware(['auth', 'verified', 'company.access', 'permission:manage_sett
     ->prefix('settings')
     ->name('settings.')
     ->group(function () {
+        Route::get('/inventory', [InventorySettingController::class, 'index'])->name('inventory.index');
+        Route::patch('/inventory/{inventorySetting}', [InventorySettingController::class, 'update'])->name('inventory.update');
         Route::get('/modules', [CompanyModuleController::class, 'index'])->name('modules.index');
         Route::patch('/modules/{companyModule}', [CompanyModuleController::class, 'update'])->name('modules.update');
     });

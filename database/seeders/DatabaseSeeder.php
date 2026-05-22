@@ -80,6 +80,9 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->call(CompanyModuleSeeder::class);
+        $this->call([
+            CompanyModuleSeeder::class,
+            CompanyInventorySettingSeeder::class,
+        ]);
     }
 }

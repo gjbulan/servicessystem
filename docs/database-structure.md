@@ -95,6 +95,7 @@ Default module keys:
 - A company has many item brands.
 - A company has many items.
 - A company has many item variants.
+- A company has one inventory setting.
 - A user belongs to one company.
 - A user belongs to many roles through `user_roles`.
 - A role belongs to one company.
@@ -115,6 +116,7 @@ Default module keys:
 - An item variant has many inventory transactions.
 - A branch item variant stock belongs to one company, branch, and item variant.
 - An inventory transaction belongs to one company, branch, item variant, and creator user.
+- A company inventory setting belongs to one company.
 
 ## Phase 1.6 Company Management
 
@@ -257,3 +259,19 @@ Allowed transaction types:
 - `return`
 
 The stock-in page displays the latest tenant-scoped inventory transactions newest first.
+
+## Phase 2.5 Optional Variant Mode
+
+### `company_inventory_settings`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `enable_item_variants` boolean, default `true`
+- `created_at`, `updated_at`
+- unique index on `company_id`
+
+Existing companies receive a setting row with `enable_item_variants = true` during migration. New companies receive the same default setting automatically.
+
+When `enable_item_variants` is disabled, the UI hides separate variant management and stores SKU, barcode, cost, selling price, and unit type on a single `item_variants` row with `variant_name = Default`.
+
+The inventory database remains variant-based. `branch_item_variant_stocks` and `inventory_transactions` continue to use `item_variant_id`.

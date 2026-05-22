@@ -10,13 +10,14 @@
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
     $canManageCompanies = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_companies'));
     $canUseTenantModules = $navigationUser && $navigationUser->company_id !== null;
+    $usesItemVariants = $canUseTenantModules && $navigationUser->company?->usesItemVariants();
     $businessNavigationLinks = collect([
         ['label' => __('Branches'), 'route' => 'branches.index', 'active' => 'branches.*', 'enabled' => $canUseTenantModules && $navigationUser?->hasPermission('manage_branches')],
         ['label' => __('Customers'), 'route' => 'customers.index', 'active' => 'customers.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('customers') && $navigationUser?->hasPermission('manage_customers')],
         ['label' => __('Categories'), 'route' => 'inventory.categories.index', 'active' => 'inventory.categories.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
         ['label' => __('Brands'), 'route' => 'inventory.brands.index', 'active' => 'inventory.brands.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
         ['label' => __('Items'), 'route' => 'inventory.items.index', 'active' => 'inventory.items.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
-        ['label' => __('Variants'), 'route' => 'inventory.variants.index', 'active' => 'inventory.variants.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
+        ['label' => __('Variants'), 'route' => 'inventory.variants.index', 'active' => 'inventory.variants.*', 'enabled' => $canUseTenantModules && $usesItemVariants && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
         ['label' => __('Stock In'), 'route' => 'inventory.stock-in.create', 'active' => 'inventory.stock-in.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
     ])->filter(fn ($link) => $link['enabled'] && \Illuminate\Support\Facades\Route::has($link['route']));
 @endphp
@@ -54,6 +55,9 @@
                     @if ($canManageModuleSettings)
                         <x-nav-link :href="route('settings.modules.index')" :active="request()->routeIs('settings.modules.*')">
                             {{ __('Modules') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('settings.inventory.index')" :active="request()->routeIs('settings.inventory.*')">
+                            {{ __('Inventory Settings') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -133,6 +137,9 @@
             @if ($canManageModuleSettings)
                 <x-responsive-nav-link :href="route('settings.modules.index')" :active="request()->routeIs('settings.modules.*')">
                     {{ __('Modules') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('settings.inventory.index')" :active="request()->routeIs('settings.inventory.*')">
+                    {{ __('Inventory Settings') }}
                 </x-responsive-nav-link>
             @endif
         </div>

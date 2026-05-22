@@ -24,6 +24,10 @@ Phase 1.5 may add module toggle infrastructure, but must not build the actual in
 
 Phase 1.6 may add company management infrastructure, but must not build branches, customers, inventory, sales, invoices, bookings, job orders, or subscriptions.
 
+Phase 2 may build branches, customers, item catalog records, variant-based inventory, branch stock, and inventory transactions. It must not build sales, POS, invoices, services, bookings, job orders, technician incentives, purchase orders, or accounting.
+
+Phase 2.5 may add optional item variant UI behavior. It must keep the inventory database variant-based and must not build sales, POS, invoices, services, bookings, job orders, technician incentives, purchase orders, or accounting.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -65,3 +69,26 @@ Phase 1.6 may add company management infrastructure, but must not build branches
 - The dashboard shows enabled modules for users assigned to a company.
 - Super Admin users see platform totals for companies, module records, roles, and permissions.
 - The dashboard does not require company access middleware yet because Phase 1 has no company onboarding flow.
+
+## Phase 2 Business Core Workflow
+
+- Branch, customer, and inventory routes require authenticated and verified users.
+- Branch routes require `company.access` and `permission:manage_branches`.
+- Customer routes require `company.access`, `module:customers`, and `permission:manage_customers`.
+- Inventory routes require `company.access`, `module:inventory`, and `permission:manage_inventory`.
+- Every business query must filter by the authenticated user's `company_id`.
+- Stock changes must create an `inventory_transactions` row.
+- Branch stock must not be changed silently outside the stock transaction flow.
+- Super Admin users with `company_id = null` cannot use tenant operational screens directly.
+
+## Phase 2.5 Optional Variant Mode Workflow
+
+- `/settings/inventory` requires `auth`, `verified`, `company.access`, and `permission:manage_settings`.
+- New companies must receive a `company_inventory_settings` row with `enable_item_variants = true`.
+- Existing companies without a setting must be backfilled to `enable_item_variants = true`.
+- When item variants are enabled, users manage item variants separately.
+- When item variants are disabled, the item form must create or update one default variant for the item.
+- The default variant uses `variant_name = Default` and stays hidden from primary simple-inventory UI labels.
+- Stock In must still submit and store `item_variant_id`.
+- Stock In must reject non-default variant IDs when variants are disabled for the company.
+- Navigation must hide the Variants link when `Company::usesItemVariants()` returns false.
