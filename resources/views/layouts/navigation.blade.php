@@ -1,13 +1,17 @@
 @php
     $navigationUser = Auth::user();
+    $canAccessTechnicianIncentives = $navigationUser
+        && $navigationUser->canAccessModule('technician_incentives')
+        && ($navigationUser->hasPermission('manage_technician_incentives') || $navigationUser->hasRole('Technician') || $navigationUser->isSuperAdmin());
     $moduleNavigationLinks = collect([
         ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index', 'permission' => 'manage_services'],
         ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index', 'permission' => 'manage_bookings'],
         ['module' => 'job_orders', 'label' => __('Job Orders'), 'route' => 'job-orders.index', 'permission' => 'manage_job_orders'],
+        ['module' => 'technician_incentives', 'label' => __('Technician Incentives'), 'route' => 'technician-incentives.index', 'enabled' => $canAccessTechnicianIncentives],
         ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index', 'permission' => null],
         ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index', 'permission' => 'manage_sales'],
         ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index', 'permission' => null],
-    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']) && (! $link['permission'] || $navigationUser?->hasPermission($link['permission'])));
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && (($link['enabled'] ?? null) || ($navigationUser?->canAccessModule($link['module']) && (! ($link['permission'] ?? null) || $navigationUser?->hasPermission($link['permission'])))));
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
     $canManageCompanies = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_companies'));
     $canManagePlatformUsers = $navigationUser && $navigationUser->isSuperAdmin();
@@ -29,6 +33,7 @@
         ['label' => __('Public Booking'), 'route' => 'bookings.public-info', 'active' => 'bookings.public-info', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('bookings') && $navigationUser?->hasPermission('manage_bookings')],
         ['label' => __('Bookings'), 'route' => 'bookings.index', 'active' => 'bookings.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('bookings') && $navigationUser?->hasPermission('manage_bookings')],
         ['label' => __('Job Orders'), 'route' => 'job-orders.index', 'active' => 'job-orders.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('job_orders') && $navigationUser?->hasPermission('manage_job_orders')],
+        ['label' => __('Technician Incentives'), 'route' => 'technician-incentives.index', 'active' => 'technician-incentives.*', 'enabled' => $canUseTenantModules && $canAccessTechnicianIncentives],
     ])->filter(fn ($link) => $link['enabled'] && \Illuminate\Support\Facades\Route::has($link['route']));
 @endphp
 

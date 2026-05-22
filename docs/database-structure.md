@@ -104,11 +104,13 @@ Default module keys:
 - A company has many bookings.
 - A company has many job orders.
 - A company has many customer asset service histories.
+- A company has many technician incentives.
 - A company has one inventory setting.
 - A user belongs to one company.
 - A user belongs to many roles through `user_roles`.
 - A user can create many job orders.
 - A user can be assigned to many job orders as a technician.
+- A user can receive technician incentives and approve technician incentives.
 - A role belongs to one company.
 - A role belongs to many users through `user_roles`.
 - A role belongs to many permissions through `role_permissions`.
@@ -121,6 +123,7 @@ Default module keys:
 - A branch has many bookings.
 - A branch has many job orders.
 - A branch has many customer asset service histories.
+- A branch has many technician incentives.
 - A customer belongs to one company.
 - A customer has many sales.
 - A customer has many customer assets.
@@ -149,15 +152,18 @@ Default module keys:
 - A service category belongs to one company and has many services.
 - A service belongs to one company and optional service category.
 - A service has many booking service and job order service rows.
+- A service has many technician incentives.
 - A booking belongs to one company, branch, optional customer, and optional customer asset.
 - A booking has many booking services and one job order.
 - A booking service belongs to one booking and service.
 - A job order belongs to one company, branch, customer, optional booking, optional customer asset, and optional creator user.
-- A job order has many technicians, services, items, and one service history.
+- A job order has many technicians, services, items, technician incentives, and one service history.
 - A job order technician belongs to one job order and one user.
 - A job order service belongs to one job order and optional service.
+- A job order service has many technician incentives.
 - A job order item belongs to one job order and optional item variant.
 - A customer asset service history belongs to one company, branch, customer, optional customer asset, and job order.
+- A technician incentive belongs to one company, branch, job order, technician user, optional job order service, optional service, and optional approver user.
 
 ## Phase 1.6 Company Management
 
@@ -459,7 +465,7 @@ Customers can have multiple assets.
 - `created_at`, `updated_at`
 - `deleted_at` for soft deletes
 
-`default_incentive_amount` is stored for later phases only. Phase 4 does not calculate technician incentives.
+`default_incentive_amount` is used by Phase 4.5 technician incentive generation. Null values are treated as zero.
 
 ### `bookings`
 
@@ -569,3 +575,30 @@ Job order item stock is deducted only when the job order is completed.
 - unique index on `job_order_id`
 
 One service history record is generated when a job order is completed.
+
+## Phase 4.5 Technician Incentives
+
+### `technician_incentives`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` foreign key to `branches.id`, cascades on hard delete
+- `job_order_id` foreign key to `job_orders.id`, cascades on hard delete
+- `job_order_service_id` nullable foreign key to `job_order_services.id`, nulls on delete
+- `technician_id` foreign key to `users.id`, cascades on hard delete
+- `service_id` nullable foreign key to `services.id`, nulls on delete
+- `service_name_snapshot`
+- `default_amount` decimal(12,2), default `0`
+- `override_amount` nullable decimal(12,2)
+- `final_amount` decimal(12,2), default `0`
+- `override_reason` nullable
+- `status` string: `pending`, `approved`, `paid`, `cancelled`; default `pending`
+- `approved_by` nullable foreign key to `users.id`, nulls on delete
+- `approved_at` nullable datetime
+- `paid_at` nullable datetime
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- unique index on `job_order_id`, `job_order_service_id`, and `technician_id`
+- indexes on company/status, company/technician, company/branch, and company/created date
+
+Incentives are generated when a job order is completed, only when the `technician_incentives` module is enabled. Each assigned Technician user receives one incentive per completed job order service. Existing incentive rows for the job order prevent duplicate generation.

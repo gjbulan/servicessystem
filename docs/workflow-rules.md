@@ -34,6 +34,8 @@ Phase 3.5 may build company staff management, platform user management, branch a
 
 Phase 4 may build asset types, customer assets, service categories, services, public booking, bookings, job orders, job order technicians, job order services/items, and service history. It must not build technician incentives, purchase orders, accounting, subscriptions, or advanced reports.
 
+Phase 4.5 may build technician incentive defaults, incentive generation from completed job order services, incentive overrides, approval, paid marking, simple incentive lists, and dashboard totals. It must not build accounting, payroll, purchase orders, subscriptions, percentage incentives, or advanced reports.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -150,7 +152,7 @@ Phase 4 may build asset types, customer assets, service categories, services, pu
 - Booking services must copy to job order services as snapshots.
 - Customer assets replace hardcoded motorcycle-specific service logic.
 - Job orders can have multiple technicians through `job_order_technicians`.
-- Job order technician assignment must only accept active users under the same company.
+- Job order technician assignment must only accept active users under the same company with the Technician role.
 - Job order services store service snapshots and optional notes/status.
 - Job order items store item variant snapshots and are optional.
 - Job order item stock must not be deducted until completion.
@@ -159,3 +161,20 @@ Phase 4 may build asset types, customer assets, service categories, services, pu
 - Completing a job order must create one `customer_asset_service_histories` record.
 - Completing a job order linked to a booking may mark the booking completed.
 - Navigation should show Asset Types, Customer Assets, Services, Service Categories, Public Booking, Bookings, and Job Orders only when the related module is enabled and the user has the required permission.
+
+## Phase 4.5 Technician Incentive Workflow
+
+- Technician incentive routes require `auth`, `verified`, `company.access`, and `module:technician_incentives`.
+- Every incentive query must filter by the authenticated user's `company_id`.
+- Technician users can view only their own incentive records.
+- Branch Manager and Company Admin users can override pending or approved incentives before they are paid.
+- Company Admin users can approve incentives and mark approved incentives as paid.
+- Paid and cancelled incentives are read-only for override purposes.
+- Completing a job order must generate incentives only after stock deduction and service history creation.
+- Incentive generation must run only when the company has the `technician_incentives` module enabled.
+- Repeating job order completion must not create duplicate incentive rows.
+- Each assigned Technician user receives one incentive per job order service in the MVP.
+- The generated default amount comes from `services.default_incentive_amount`; null defaults are treated as zero.
+- `final_amount` equals `override_amount` when present, otherwise `default_amount`.
+- Cancelled incentives are excluded from unpaid dashboard totals by summing only pending and approved statuses.
+- Dashboard incentive totals remain simple: pending, approved unpaid, and paid this month.

@@ -22,6 +22,7 @@ use App\Http\Controllers\Services\CustomerAssetController;
 use App\Http\Controllers\Services\ServiceCategoryController;
 use App\Http\Controllers\Services\ServiceController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\TechnicianIncentiveController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -128,6 +129,19 @@ Route::middleware(['auth', 'verified', 'company.access'])->group(function () {
             Route::post('/{jobOrder}/assign-technicians', [JobOrderController::class, 'updateTechnicians'])->name('technicians.update');
             Route::post('/{jobOrder}/complete', [JobOrderController::class, 'complete'])->name('complete');
             Route::post('/{jobOrder}/cancel', [JobOrderController::class, 'cancel'])->name('cancel');
+        });
+
+    Route::middleware('module:technician_incentives')
+        ->prefix('technician-incentives')
+        ->name('technician-incentives.')
+        ->group(function () {
+            Route::get('/', [TechnicianIncentiveController::class, 'index'])->name('index');
+            Route::get('/{technicianIncentive}', [TechnicianIncentiveController::class, 'show'])->name('show');
+            Route::get('/{technicianIncentive}/edit', [TechnicianIncentiveController::class, 'edit'])->name('edit');
+            Route::match(['put', 'patch'], '/{technicianIncentive}', [TechnicianIncentiveController::class, 'update'])->name('update');
+            Route::post('/{technicianIncentive}/approve', [TechnicianIncentiveController::class, 'approve'])->name('approve');
+            Route::post('/{technicianIncentive}/mark-paid', [TechnicianIncentiveController::class, 'markPaid'])->name('mark-paid');
+            Route::post('/{technicianIncentive}/cancel', [TechnicianIncentiveController::class, 'cancel'])->name('cancel');
         });
 
     Route::middleware(['module:sales', 'permission:manage_sales'])

@@ -2,6 +2,9 @@
     $sidebarUser = Auth::user();
     $canUseCompanyModules = $sidebarUser && $sidebarUser->company_id !== null;
     $usesItemVariants = $canUseCompanyModules && $sidebarUser->company?->usesItemVariants();
+    $canAccessTechnicianIncentives = $sidebarUser
+        && $sidebarUser->canAccessModule('technician_incentives')
+        && ($sidebarUser->hasPermission('manage_technician_incentives') || $sidebarUser->hasRole('Technician') || $sidebarUser->isSuperAdmin());
     $staffLinks = collect([
         ['label' => __('Staff'), 'route' => 'staff.index', 'active' => 'staff.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->hasPermission('manage_users'));
@@ -24,6 +27,9 @@
     $jobOrderLinks = collect([
         ['label' => __('Job Orders'), 'route' => 'job-orders.index', 'active' => 'job-orders.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('job_orders') && $sidebarUser->hasPermission('manage_job_orders'));
+    $incentiveLinks = collect([
+        ['label' => __('Technician Incentives'), 'route' => 'technician-incentives.index', 'active' => 'technician-incentives.*'],
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $canAccessTechnicianIncentives);
     $customerLinks = collect([
         ['label' => __('Customers'), 'route' => 'customers.index', 'active' => 'customers.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('customers') && $sidebarUser->hasPermission('manage_customers'));
@@ -36,7 +42,7 @@
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('inventory') && $sidebarUser->hasPermission('manage_inventory') && (! ($link['requires_variants'] ?? false) || $usesItemVariants));
 @endphp
 
-@if ($staffLinks->isNotEmpty() || $branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $serviceLinks->isNotEmpty() || $bookingLinks->isNotEmpty() || $jobOrderLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
+@if ($staffLinks->isNotEmpty() || $branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $serviceLinks->isNotEmpty() || $bookingLinks->isNotEmpty() || $jobOrderLinks->isNotEmpty() || $incentiveLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
     <aside class="hidden w-64 shrink-0 border-r border-gray-200 bg-white lg:block">
         <div class="sticky top-0 space-y-6 p-6">
             @if ($branchLinks->isNotEmpty())
@@ -100,6 +106,17 @@
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Job Orders') }}</p>
                     <div class="mt-3 space-y-1">
                         @foreach ($jobOrderLinks as $link)
+                            <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
+                        @endforeach
+                    </div>
+                </nav>
+            @endif
+
+            @if ($incentiveLinks->isNotEmpty())
+                <nav>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Incentives') }}</p>
+                    <div class="mt-3 space-y-1">
+                        @foreach ($incentiveLinks as $link)
                             <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
                         @endforeach
                     </div>

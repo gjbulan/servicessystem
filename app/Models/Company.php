@@ -109,6 +109,11 @@ class Company extends Model
         return $this->hasMany(CustomerAssetServiceHistory::class);
     }
 
+    public function technicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class);
+    }
+
     public function roles(): HasMany
     {
         return $this->hasMany(Role::class);

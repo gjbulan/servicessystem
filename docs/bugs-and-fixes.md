@@ -46,3 +46,10 @@
 - `vendor\bin\pint` passed.
 - `php artisan test --filter=ServiceOperationsTest` passed with 7 tests.
 - `php artisan test` passed with 65 tests.
+
+## 2026-05-22 Phase 4.5
+
+- Fixed a navigation guard bug where module links controlled only by an explicit `enabled` flag could trigger an undefined `permission` key when rendered for users without incentive access.
+- `php artisan test --filter=TechnicianIncentiveTest` passed with 8 tests.
+- `vendor\bin\pint` passed.
+- `php artisan test` passed with 73 tests.

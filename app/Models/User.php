@@ -73,6 +73,16 @@ class User extends Authenticatable
         return $this->hasMany(JobOrderTechnician::class, 'technician_id');
     }
 
+    public function technicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class, 'technician_id');
+    }
+
+    public function approvedTechnicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class, 'approved_by');
+    }
+
     /**
      * @param  string|array<int, string>  $roles
      */

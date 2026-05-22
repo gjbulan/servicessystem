@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\CompanyModule;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\TechnicianIncentive;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -49,6 +50,8 @@ class DashboardController extends Controller
         ];
 
         $staffStats = null;
+        $incentiveStats = null;
+        $technicianIncentiveStats = null;
         $usersByCompany = collect();
 
         if ($isPlatformAdmin) {
@@ -91,12 +94,80 @@ class DashboardController extends Controller
                     'description' => 'Staff blocked from sign in',
                 ],
             ];
+
+            if ($user->canAccessModule('technician_incentives')) {
+                $canManageIncentives = $user->hasPermission('manage_technician_incentives')
+                    || $user->hasRole(['Company Admin', 'Branch Manager'])
+                    || $user->isSuperAdmin();
+                $isTechnician = $user->hasRole('Technician');
+                $startOfMonth = now()->startOfMonth();
+                $endOfMonth = now()->endOfMonth();
+
+                if ($canManageIncentives) {
+                    $incentiveStats = [
+                        [
+                            'label' => 'Pending incentives',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('status', 'pending')
+                                ->sum('final_amount'),
+                            'description' => 'Awaiting approval',
+                        ],
+                        [
+                            'label' => 'Approved unpaid',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('status', 'approved')
+                                ->sum('final_amount'),
+                            'description' => 'Approved but not yet paid',
+                        ],
+                        [
+                            'label' => 'Paid this month',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('status', 'paid')
+                                ->whereBetween('paid_at', [$startOfMonth, $endOfMonth])
+                                ->sum('final_amount'),
+                            'description' => 'Paid incentives in the current month',
+                        ],
+                    ];
+                }
+
+                if ($isTechnician) {
+                    $technicianIncentiveStats = [
+                        [
+                            'label' => 'My pending incentives',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('technician_id', $user->id)
+                                ->where('status', 'pending')
+                                ->sum('final_amount'),
+                            'description' => 'Awaiting approval',
+                        ],
+                        [
+                            'label' => 'My approved unpaid',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('technician_id', $user->id)
+                                ->where('status', 'approved')
+                                ->sum('final_amount'),
+                            'description' => 'Approved but not yet paid',
+                        ],
+                        [
+                            'label' => 'My paid this month',
+                            'value' => TechnicianIncentive::where('company_id', $user->company_id)
+                                ->where('technician_id', $user->id)
+                                ->where('status', 'paid')
+                                ->whereBetween('paid_at', [$startOfMonth, $endOfMonth])
+                                ->sum('final_amount'),
+                            'description' => 'Paid incentives in the current month',
+                        ],
+                    ];
+                }
+            }
         }
 
         return view('dashboard', [
             'foundationStats' => $foundationStats,
+            'incentiveStats' => $incentiveStats,
             'isPlatformAdmin' => $isPlatformAdmin,
             'staffStats' => $staffStats,
+            'technicianIncentiveStats' => $technicianIncentiveStats,
             'user' => $user,
             'usersByCompany' => $usersByCompany,
         ]);

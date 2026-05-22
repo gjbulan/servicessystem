@@ -131,6 +131,42 @@
                 </div>
             @endif
 
+            @if ($incentiveStats)
+                <div class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Technician incentives') }}</h3>
+
+                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                            @foreach ($incentiveStats as $stat)
+                                <div class="rounded-lg border border-gray-200 p-4">
+                                    <p class="text-sm font-medium text-gray-500">{{ $stat['label'] }}</p>
+                                    <p class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format((float) $stat['value'], 2) }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ $stat['description'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($technicianIncentiveStats)
+                <div class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('My incentives') }}</h3>
+
+                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                            @foreach ($technicianIncentiveStats as $stat)
+                                <div class="rounded-lg border border-gray-200 p-4">
+                                    <p class="text-sm font-medium text-gray-500">{{ $stat['label'] }}</p>
+                                    <p class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format((float) $stat['value'], 2) }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ $stat['description'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if ($isPlatformAdmin && $usersByCompany->isNotEmpty())
                 <div class="bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">

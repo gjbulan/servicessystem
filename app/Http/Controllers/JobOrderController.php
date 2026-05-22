@@ -11,6 +11,7 @@ use App\Models\InventoryTransaction;
 use App\Models\ItemVariant;
 use App\Models\JobOrder;
 use App\Models\Service;
+use App\Models\TechnicianIncentive;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -137,6 +138,7 @@ class JobOrderController extends Controller
             'technicians' => User::query()
                 ->where('company_id', $company->id)
                 ->where('status', 'active')
+                ->whereHas('roles', fn ($query) => $query->where('name', 'Technician'))
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -162,6 +164,22 @@ class JobOrderController extends Controller
             ->filter(fn ($row) => ! empty($row['technician_id']) && (! $hasSelectedMarkers || ! empty($row['selected'])))
             ->unique(fn ($row) => (int) $row['technician_id'])
             ->values();
+
+        $technicianIds = $rows->pluck('technician_id')->map(fn ($id) => (int) $id)->all();
+        $validTechnicianIds = User::query()
+            ->where('company_id', $company->id)
+            ->where('status', 'active')
+            ->whereIn('id', $technicianIds)
+            ->whereHas('roles', fn ($query) => $query->where('name', 'Technician'))
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if (count($technicianIds) !== count($validTechnicianIds)) {
+            throw ValidationException::withMessages([
+                'technicians' => 'Only active users with the Technician role can be assigned.',
+            ]);
+        }
 
         DB::transaction(function () use ($jobOrder, $rows): void {
             $jobOrder->technicians()->delete();
@@ -193,7 +211,7 @@ class JobOrderController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $jobOrder->load(['booking', 'items', 'services']);
+            $jobOrder->load(['booking', 'items', 'services.service', 'technicians.technician.roles']);
             $this->deductInventoryOnce($jobOrder, $request->user()->id);
             $completedAt = $jobOrder->completed_at ?? now();
 
@@ -204,6 +222,7 @@ class JobOrderController extends Controller
             ]);
 
             $this->createServiceHistoryOnce($jobOrder);
+            $this->generateTechnicianIncentivesOnce($jobOrder, $company);
 
             if ($jobOrder->booking) {
                 $jobOrder->booking->update(['status' => 'completed']);
@@ -434,5 +453,44 @@ class JobOrderController extends Controller
             'service_date' => ($jobOrder->completed_at ?? now())->toDateString(),
             'notes' => $jobOrder->inspection_notes,
         ]);
+    }
+
+    private function generateTechnicianIncentivesOnce(JobOrder $jobOrder, Company $company): void
+    {
+        if (! $company->hasModule('technician_incentives')) {
+            return;
+        }
+
+        $alreadyGenerated = TechnicianIncentive::withTrashed()
+            ->where('company_id', $jobOrder->company_id)
+            ->where('job_order_id', $jobOrder->id)
+            ->exists();
+
+        if ($alreadyGenerated || $jobOrder->services->isEmpty() || $jobOrder->technicians->isEmpty()) {
+            return;
+        }
+
+        foreach ($jobOrder->services as $jobOrderService) {
+            $defaultAmount = (float) ($jobOrderService->service?->default_incentive_amount ?? 0);
+
+            foreach ($jobOrder->technicians as $assignment) {
+                if (! $assignment->technician?->roles->contains('name', 'Technician')) {
+                    continue;
+                }
+
+                TechnicianIncentive::create([
+                    'company_id' => $jobOrder->company_id,
+                    'branch_id' => $jobOrder->branch_id,
+                    'job_order_id' => $jobOrder->id,
+                    'job_order_service_id' => $jobOrderService->id,
+                    'technician_id' => $assignment->technician_id,
+                    'service_id' => $jobOrderService->service_id,
+                    'service_name_snapshot' => $jobOrderService->service_name_snapshot,
+                    'default_amount' => $defaultAmount,
+                    'final_amount' => $defaultAmount,
+                    'status' => 'pending',
+                ]);
+            }
+        }
     }
 }

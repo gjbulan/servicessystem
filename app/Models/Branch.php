@@ -57,4 +57,9 @@ class Branch extends Model
     {
         return $this->hasMany(CustomerAssetServiceHistory::class);
     }
+
+    public function technicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class);
+    }
 }

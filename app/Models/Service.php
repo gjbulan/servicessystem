@@ -49,4 +49,9 @@ class Service extends Model
     {
         return $this->hasMany(JobOrderService::class);
     }
+
+    public function technicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class);
+    }
 }

@@ -97,4 +97,9 @@ class JobOrder extends Model
     {
         return $this->hasOne(CustomerAssetServiceHistory::class);
     }
+
+    public function technicianIncentives(): HasMany
+    {
+        return $this->hasMany(TechnicianIncentive::class);
+    }
 }

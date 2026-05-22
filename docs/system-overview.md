@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 4 is in progress as service operations on top of the completed SaaS, inventory, sales, and user management foundations. The completed foundation includes:
+Phase 4.5 adds technician incentives on top of the completed SaaS, inventory, sales, user management, and service operations foundations. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -30,6 +30,7 @@ Phase 4 is in progress as service operations on top of the completed SaaS, inven
 - Service categories and services.
 - Public booking and booking management.
 - Job orders with multiple technicians, services, items, stock usage, and service history.
+- Technician incentives generated from completed job order services.
 
 ## Implemented Application Areas
 
@@ -148,9 +149,21 @@ Phase 4 adds service workflows for motoshops, solar service, repair shops, and o
 - Job order completion writes `inventory_transactions` with `transaction_type = job_order_usage`.
 - Job order completion creates a customer asset service history record.
 
+## Phase 4.5 Technician Incentives
+
+Phase 4.5 tracks technician incentives without adding payroll or accounting.
+
+- Services expose `default_incentive_amount` in the setup UI.
+- Completing a job order generates technician incentives only when the `technician_incentives` module is enabled.
+- Incentives are generated per assigned Technician user per completed job order service.
+- Incentive generation is idempotent, so repeated completion does not duplicate rows.
+- Branch Managers and Company Admins can override unpaid incentives with a reason.
+- Company Admins can approve incentives and mark approved incentives as paid.
+- Technician users can view only their own incentive records.
+- Dashboard cards show pending, approved unpaid, and paid-this-month totals.
+
 The following modules remain intentionally out of scope:
 
-- Technician incentives.
 - Purchase orders.
 - Accounting.
 - Subscriptions.
