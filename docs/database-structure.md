@@ -95,6 +95,7 @@ Default module keys:
 - A company has many item brands.
 - A company has many items.
 - A company has many item variants.
+- A company has many sales.
 - A company has one inventory setting.
 - A user belongs to one company.
 - A user belongs to many roles through `user_roles`.
@@ -106,7 +107,9 @@ Default module keys:
 - A branch belongs to one company.
 - A branch has many branch item variant stocks.
 - A branch has many inventory transactions.
+- A branch has many sales.
 - A customer belongs to one company.
+- A customer has many sales.
 - An item category belongs to one company and has many items.
 - An item brand belongs to one company and has many items.
 - An item belongs to one company, category, and brand.
@@ -114,9 +117,14 @@ Default module keys:
 - An item variant belongs to one company and item.
 - An item variant has many branch stock records.
 - An item variant has many inventory transactions.
+- An item variant has many sale items.
 - A branch item variant stock belongs to one company, branch, and item variant.
 - An inventory transaction belongs to one company, branch, item variant, and creator user.
 - A company inventory setting belongs to one company.
+- A sale belongs to one company, branch, customer, and creator user.
+- A sale has many sale items and sale payments.
+- A sale item belongs to one company, sale, and item variant.
+- A sale payment belongs to one company, sale, and receiver user.
 
 ## Phase 1.6 Company Management
 
@@ -257,6 +265,7 @@ Allowed transaction types:
 - `manual_adjustment`
 - `damage`
 - `return`
+- `sale`
 
 The stock-in page displays the latest tenant-scoped inventory transactions newest first.
 
@@ -275,3 +284,58 @@ Existing companies receive a setting row with `enable_item_variants = true` duri
 When `enable_item_variants` is disabled, the UI hides separate variant management and stores SKU, barcode, cost, selling price, and unit type on a single `item_variants` row with `variant_name = Default`.
 
 The inventory database remains variant-based. `branch_item_variant_stocks` and `inventory_transactions` continue to use `item_variant_id`.
+
+## Phase 3 Sales & Invoicing Core
+
+### `sales`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` foreign key to `branches.id`, cascades on hard delete
+- `customer_id` nullable foreign key to `customers.id`, nulls on delete
+- `sale_number`
+- `status` string: `draft`, `unpaid`, `partial`, `paid`, `void`
+- `sale_date`
+- `subtotal` decimal(12,2), default `0`
+- `discount_amount` decimal(12,2), default `0`
+- `tax_amount` decimal(12,2), default `0`
+- `total` decimal(12,2), default `0`
+- `amount_paid` decimal(12,2), default `0`
+- `balance_due` decimal(12,2), default `0`
+- `notes` nullable
+- `created_by` nullable foreign key to `users.id`, nulls on delete
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- unique index on `company_id`, `sale_number`
+
+### `sale_items`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `sale_id` foreign key to `sales.id`, cascades on hard delete
+- `item_variant_id` foreign key to `item_variants.id`, cascades on hard delete
+- `item_name_snapshot`
+- `variant_name_snapshot` nullable
+- `sku_snapshot` nullable
+- `quantity` decimal(12,2)
+- `unit_price` decimal(12,2)
+- `cost_price_snapshot` decimal(12,2)
+- `line_total` decimal(12,2)
+- `created_at`, `updated_at`
+
+Sale item snapshots preserve item and pricing details even if catalog records change later.
+
+### `sale_payments`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `sale_id` foreign key to `sales.id`, cascades on hard delete
+- `payment_method` nullable
+- `reference_number` nullable
+- `amount` decimal(12,2)
+- `paid_at`
+- `received_by` nullable foreign key to `users.id`, nulls on delete
+- `notes` nullable
+- `created_at`, `updated_at`
+
+Paid sales create `inventory_transactions` rows with `transaction_type = sale`, negative quantities, `reference_type = Sale`, and `reference_id` set to the sale ID.

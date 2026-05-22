@@ -39,7 +39,7 @@ class StockInController extends Controller
                 ->where('status', 'active')
                 ->orderBy('name')
                 ->get(),
-            'transactionTypes' => InventoryTransaction::TYPES,
+            'transactionTypes' => InventoryTransaction::STOCK_ENTRY_TYPES,
             'usesItemVariants' => $usesItemVariants,
             'variants' => $variants,
             'recentTransactions' => InventoryTransaction::query()
@@ -66,7 +66,7 @@ class StockInController extends Controller
         $data = $request->validate([
             'branch_id' => ['required', Rule::exists('branches', 'id')->where('company_id', $company->id)],
             'item_variant_id' => ['required', Rule::exists('item_variants', 'id')->where('company_id', $company->id)],
-            'transaction_type' => ['required', Rule::in(array_keys(InventoryTransaction::TYPES))],
+            'transaction_type' => ['required', Rule::in(array_keys(InventoryTransaction::STOCK_ENTRY_TYPES))],
             'quantity' => ['required', 'numeric', 'gt:0', 'max:9999999999.99'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);

@@ -12,6 +12,7 @@ use App\Http\Controllers\Inventory\ItemVariantController;
 use App\Http\Controllers\Inventory\StockInController;
 use App\Http\Controllers\InventorySettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Sales\SaleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -67,6 +68,21 @@ Route::middleware(['auth', 'verified', 'company.access'])->group(function () {
                 ->parameters(['variants' => 'variant']);
             Route::get('/stock-in', [StockInController::class, 'create'])->name('stock-in.create');
             Route::post('/stock-in', [StockInController::class, 'store'])->name('stock-in.store');
+        });
+
+    Route::middleware(['module:sales', 'permission:manage_sales'])
+        ->prefix('sales')
+        ->name('sales.')
+        ->group(function () {
+            Route::get('/', [SaleController::class, 'index'])->name('index');
+            Route::get('/create', [SaleController::class, 'create'])->name('create');
+            Route::post('/', [SaleController::class, 'store'])->name('store');
+            Route::get('/{sale}/payments', [SaleController::class, 'payments'])->name('payments');
+            Route::post('/{sale}/payments', [SaleController::class, 'storePayment'])->name('payments.store');
+            Route::get('/{sale}/print', [SaleController::class, 'printView'])->name('print');
+            Route::get('/{sale}', [SaleController::class, 'show'])->name('show');
+            Route::get('/{sale}/edit', [SaleController::class, 'edit'])->name('edit');
+            Route::match(['put', 'patch'], '/{sale}', [SaleController::class, 'update'])->name('update');
         });
 });
 

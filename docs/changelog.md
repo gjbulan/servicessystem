@@ -70,3 +70,16 @@
 - Added `OptionalVariantModeTest` coverage for defaults, navigation, default variant creation/update, and stock-in.
 - Ran `php artisan test --filter=OptionalVariantModeTest`: 5 tests passed.
 - Ran `php artisan test`: 44 tests passed.
+- Added Phase 3 sales and invoicing core.
+- Added `sales`, `sale_items`, and `sale_payments` migrations.
+- Added `Sale`, `SaleItem`, and `SalePayment` models and relationships.
+- Added `manage_sales` permission and assigned it to Super Admin, Company Admin, Branch Manager, and Cashier roles.
+- Added sales routes for index, create, store, show, edit, update, payments, and print.
+- Added `Sales\SaleController` with tenant-scoped sale creation, snapshots, payment status updates, and paid-sale stock deduction.
+- Added Sales Blade views, including a print-friendly receipt/invoice page.
+- Added sales navigation that requires the sales module and `manage_sales`.
+- Added `sale` inventory transaction type and restricted manual Stock In to stock-entry transaction types.
+- Added `SalesCoreTest` coverage for creation, snapshots, payments, stock deduction, tenant safety, and variant mode off.
+- Ran Laravel Pint successfully.
+- Ran `php artisan test --filter=SalesCoreTest`: 6 tests passed.
+- Ran `php artisan test`: 50 tests passed.

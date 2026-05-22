@@ -1,12 +1,12 @@
 @php
     $navigationUser = Auth::user();
     $moduleNavigationLinks = collect([
-        ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index'],
-        ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index'],
-        ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index'],
-        ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index'],
-        ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index'],
-    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']));
+        ['module' => 'services', 'label' => __('Services'), 'route' => 'services.index', 'permission' => null],
+        ['module' => 'bookings', 'label' => __('Bookings'), 'route' => 'bookings.index', 'permission' => null],
+        ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index', 'permission' => null],
+        ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index', 'permission' => 'manage_sales'],
+        ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index', 'permission' => null],
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']) && (! $link['permission'] || $navigationUser?->hasPermission($link['permission'])));
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
     $canManageCompanies = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_companies'));
     $canUseTenantModules = $navigationUser && $navigationUser->company_id !== null;

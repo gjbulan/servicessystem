@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 2.5 is in progress as an inventory usability extension on top of the completed business core foundation. The completed foundation includes:
+Phase 3 is in progress as the sales and invoicing core on top of the completed SaaS, company, and inventory foundations. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -23,6 +23,7 @@ Phase 2.5 is in progress as an inventory usability extension on top of the compl
 - Inventory catalog foundation.
 - Branch stock and inventory transactions.
 - Optional inventory variant mode.
+- Sales, sale items, payments, and receipt/invoice printing.
 
 ## Implemented Application Areas
 
@@ -97,10 +98,23 @@ Phase 2.5 adds company-level inventory settings for simple and variant-heavy bus
 - The Variants navigation link is hidden when variants are disabled.
 - Stock In shows item labels instead of variant labels when variants are disabled.
 
+## Phase 3 Sales & Invoicing Core
+
+Phase 3 adds tenant sales records and payment handling.
+
+- `sales` stores branch, customer, totals, status, amount paid, and balance due.
+- `sale_items` stores sold `item_variant_id` values and item snapshots.
+- `sale_payments` stores payment records.
+- Sales can be saved as draft or unpaid.
+- Payments move sales to partial or paid.
+- Inventory is deducted only once when a sale becomes paid.
+- Sale stock deduction writes `inventory_transactions` with `transaction_type = sale`.
+- `/sales/{sale}/print` provides a print-friendly receipt/invoice page.
+
+Phase 3 does not create a separate invoices table yet.
+
 The following modules remain intentionally out of scope:
 
-- Sales/POS.
-- Invoices.
 - Services.
 - Bookings.
 - Job orders.

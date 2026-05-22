@@ -114,6 +114,7 @@ Added foundation support:
 - `manage_services`
 - `manage_bookings`
 - `manage_job_orders`
+- `manage_sales`
 - `manage_invoices`
 - `manage_inventory`
 - `view_reports`

@@ -28,6 +28,8 @@ Phase 2 may build branches, customers, item catalog records, variant-based inven
 
 Phase 2.5 may add optional item variant UI behavior. It must keep the inventory database variant-based and must not build sales, POS, invoices, services, bookings, job orders, technician incentives, purchase orders, or accounting.
 
+Phase 3 may build sales, sale line items, payments, paid-sale stock deduction, and a print-friendly receipt/invoice page. It must not build services, bookings, job orders, technician incentives, purchase orders, or accounting.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -92,3 +94,19 @@ Phase 2.5 may add optional item variant UI behavior. It must keep the inventory 
 - Stock In must still submit and store `item_variant_id`.
 - Stock In must reject non-default variant IDs when variants are disabled for the company.
 - Navigation must hide the Variants link when `Company::usesItemVariants()` returns false.
+
+## Phase 3 Sales Workflow
+
+- Sales routes require `auth`, `verified`, `company.access`, `module:sales`, and `permission:manage_sales`.
+- Every sales query must filter by the authenticated user's `company_id`.
+- Sale items must store `item_variant_id` internally.
+- Sale items must snapshot item name, variant name, SKU, unit price, and cost price.
+- Sale item selectors must work with variant mode enabled and disabled.
+- Draft and unpaid sales can be edited while they have no payments.
+- Partial, paid, and void sales cannot be edited in this phase.
+- Payments cannot exceed the current balance due.
+- Payment recording updates `amount_paid`, `balance_due`, and sale status.
+- Inventory is deducted only when a sale becomes paid.
+- Paid sale stock deduction creates `inventory_transactions` with `transaction_type = sale`, negative quantity, `reference_type = Sale`, and `reference_id = sale id`.
+- Paid sale stock deduction must check for existing sale inventory transactions before deducting so stock is not deducted twice.
+- The Sales navigation link should render only when the sales module is enabled and the user has `manage_sales`.

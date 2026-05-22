@@ -69,6 +69,11 @@ class Company extends Model
         return $this->hasMany(ItemVariant::class);
     }
 
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     public function roles(): HasMany
     {
         return $this->hasMany(Role::class);

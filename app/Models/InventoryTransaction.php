@@ -13,6 +13,15 @@ class InventoryTransaction extends Model
         'manual_adjustment' => 'Manual Adjustment',
         'damage' => 'Damage',
         'return' => 'Return',
+        'sale' => 'Sale',
+    ];
+
+    public const STOCK_ENTRY_TYPES = [
+        'initial_stock' => 'Initial Stock',
+        'stock_in' => 'Stock In',
+        'manual_adjustment' => 'Manual Adjustment',
+        'damage' => 'Damage',
+        'return' => 'Return',
     ];
 
     protected $fillable = [
