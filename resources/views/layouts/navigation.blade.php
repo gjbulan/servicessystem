@@ -9,9 +9,11 @@
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']) && (! $link['permission'] || $navigationUser?->hasPermission($link['permission'])));
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
     $canManageCompanies = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_companies'));
+    $canManagePlatformUsers = $navigationUser && $navigationUser->isSuperAdmin();
     $canUseTenantModules = $navigationUser && $navigationUser->company_id !== null;
     $usesItemVariants = $canUseTenantModules && $navigationUser->company?->usesItemVariants();
     $businessNavigationLinks = collect([
+        ['label' => __('Staff'), 'route' => 'staff.index', 'active' => 'staff.*', 'enabled' => $canUseTenantModules && $navigationUser?->hasPermission('manage_users')],
         ['label' => __('Branches'), 'route' => 'branches.index', 'active' => 'branches.*', 'enabled' => $canUseTenantModules && $navigationUser?->hasPermission('manage_branches')],
         ['label' => __('Customers'), 'route' => 'customers.index', 'active' => 'customers.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('customers') && $navigationUser?->hasPermission('manage_customers')],
         ['label' => __('Categories'), 'route' => 'inventory.categories.index', 'active' => 'inventory.categories.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('inventory') && $navigationUser?->hasPermission('manage_inventory')],
@@ -43,6 +45,12 @@
                     @if ($canManageCompanies)
                         <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
                             {{ __('Companies') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if ($canManagePlatformUsers)
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            {{ __('Platform Users') }}
                         </x-nav-link>
                     @endif
 
@@ -119,6 +127,12 @@
             @if ($canManageCompanies)
                 <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
                     {{ __('Companies') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if ($canManagePlatformUsers)
+                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    {{ __('Platform Users') }}
                 </x-responsive-nav-link>
             @endif
 

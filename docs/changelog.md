@@ -83,3 +83,19 @@
 - Ran Laravel Pint successfully.
 - Ran `php artisan test --filter=SalesCoreTest`: 6 tests passed.
 - Ran `php artisan test`: 50 tests passed.
+- Added Phase 3.5 staff and user management.
+- Added `users.deleted_at` migration and enabled soft deletes on `User`.
+- Added inactive login blocking in the Breeze login request.
+- Added `StaffController` and `/staff` CRUD routes for tenant staff management.
+- Added `Admin\UserController` and `/admin/users` CRUD routes for platform user management.
+- Added staff and platform user Blade views.
+- Added one-role and one-branch assignment through `user_roles.branch_id`.
+- Added protection against company admins assigning Super Admin role or deleting themselves.
+- Added last-Super-Admin deletion protection.
+- Updated dashboard with company staff totals and platform user totals.
+- Updated navigation with Staff and Platform Users links.
+- Added `StaffUserManagementTest` coverage for tenant safety, role assignment, platform user management, self-delete protection, last-Super-Admin protection, and inactive login blocking.
+- Updated profile deletion coverage to expect user soft deletes.
+- Ran Laravel Pint successfully.
+- Ran `php artisan test --filter=StaffUserManagementTest`: 8 tests passed.
+- Ran `php artisan test`: 58 tests passed.

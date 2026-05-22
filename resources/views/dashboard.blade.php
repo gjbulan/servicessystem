@@ -71,6 +71,9 @@
                                     <a href="{{ route('admin.companies.index') }}" class="inline-flex font-medium text-gray-900 hover:text-gray-700">
                                         {{ __('Manage companies') }}
                                     </a>
+                                    <a href="{{ route('admin.users.index') }}" class="block font-medium text-gray-900 hover:text-gray-700">
+                                        {{ __('Manage platform users') }}
+                                    </a>
                                 </div>
                             </div>
                         @else
@@ -109,6 +112,44 @@
                     </div>
                 </div>
             </div>
+
+            @if ($staffStats)
+                <div class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Staff status') }}</h3>
+
+                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                            @foreach ($staffStats as $stat)
+                                <div class="rounded-lg border border-gray-200 p-4">
+                                    <p class="text-sm font-medium text-gray-500">{{ $stat['label'] }}</p>
+                                    <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $stat['value'] }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ $stat['description'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if ($isPlatformAdmin && $usersByCompany->isNotEmpty())
+                <div class="bg-white shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Users by company') }}</h3>
+
+                        <div class="mt-4 divide-y divide-gray-100">
+                            @foreach ($usersByCompany as $company)
+                                <div class="flex items-center justify-between py-3">
+                                    <div>
+                                        <p class="font-medium text-gray-900">{{ $company->name }}</p>
+                                        <p class="text-sm text-gray-500">{{ $company->slug }}</p>
+                                    </div>
+                                    <p class="text-lg font-semibold text-gray-900">{{ $company->users_count }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

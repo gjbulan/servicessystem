@@ -1,0 +1,15 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Create Staff') }}</h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <section class="bg-white shadow-sm sm:rounded-lg">
+                <form method="POST" action="{{ route('staff.store') }}" class="p-6">
+                    @include('staff._form', ['buttonLabel' => __('Create Staff')])
+                </form>
+            </section>
+        </div>
+    </div>
+</x-app-layout>

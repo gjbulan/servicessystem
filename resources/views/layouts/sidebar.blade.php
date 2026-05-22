@@ -2,6 +2,9 @@
     $sidebarUser = Auth::user();
     $canUseCompanyModules = $sidebarUser && $sidebarUser->company_id !== null;
     $usesItemVariants = $canUseCompanyModules && $sidebarUser->company?->usesItemVariants();
+    $staffLinks = collect([
+        ['label' => __('Staff'), 'route' => 'staff.index', 'active' => 'staff.*'],
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->hasPermission('manage_users'));
     $branchLinks = collect([
         ['label' => __('Branches'), 'route' => 'branches.index', 'active' => 'branches.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->hasPermission('manage_branches'));
@@ -20,14 +23,26 @@
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('inventory') && $sidebarUser->hasPermission('manage_inventory') && (! ($link['requires_variants'] ?? false) || $usesItemVariants));
 @endphp
 
-@if ($branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
+@if ($staffLinks->isNotEmpty() || $branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
     <aside class="hidden w-64 shrink-0 border-r border-gray-200 bg-white lg:block">
         <div class="sticky top-0 space-y-6 p-6">
             @if ($branchLinks->isNotEmpty())
                 <nav>
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Operations') }}</p>
                     <div class="mt-3 space-y-1">
+                        @foreach ($staffLinks as $link)
+                            <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
+                        @endforeach
                         @foreach ($branchLinks as $link)
+                            <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
+                        @endforeach
+                    </div>
+                </nav>
+            @elseif ($staffLinks->isNotEmpty())
+                <nav>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Operations') }}</p>
+                    <div class="mt-3 space-y-1">
+                        @foreach ($staffLinks as $link)
                             <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
                         @endforeach
                     </div>

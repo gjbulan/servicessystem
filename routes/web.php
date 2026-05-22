@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CompanyModuleController;
 use App\Http\Controllers\CustomerController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Inventory\StockInController;
 use App\Http\Controllers\InventorySettingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Sales\SaleController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,7 +50,18 @@ Route::middleware(['auth', 'verified', 'permission:manage_companies'])
         Route::resource('companies', AdminCompanyController::class);
     });
 
+Route::middleware(['auth', 'verified', 'role:Super Admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('users', AdminUserController::class);
+    });
+
 Route::middleware(['auth', 'verified', 'company.access'])->group(function () {
+    Route::middleware('permission:manage_users')
+        ->resource('staff', StaffController::class)
+        ->parameters(['staff' => 'user']);
+
     Route::middleware('permission:manage_branches')
         ->resource('branches', BranchController::class);
 

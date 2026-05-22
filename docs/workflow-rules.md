@@ -30,6 +30,8 @@ Phase 2.5 may add optional item variant UI behavior. It must keep the inventory 
 
 Phase 3 may build sales, sale line items, payments, paid-sale stock deduction, and a print-friendly receipt/invoice page. It must not build services, bookings, job orders, technician incentives, purchase orders, or accounting.
 
+Phase 3.5 may build company staff management, platform user management, branch assignment for staff, inactive-login blocking, and staff dashboard totals. It must not build services, bookings, job orders, incentives, purchase orders, accounting, or subscriptions.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -110,3 +112,22 @@ Phase 3 may build sales, sale line items, payments, paid-sale stock deduction, a
 - Paid sale stock deduction creates `inventory_transactions` with `transaction_type = sale`, negative quantity, `reference_type = Sale`, and `reference_id = sale id`.
 - Paid sale stock deduction must check for existing sale inventory transactions before deducting so stock is not deducted twice.
 - The Sales navigation link should render only when the sales module is enabled and the user has `manage_sales`.
+
+## Phase 3.5 Staff & User Workflow
+
+- `/staff` routes require `auth`, `verified`, `company.access`, and `permission:manage_users`.
+- Company staff queries must filter by the authenticated user's `company_id`.
+- Company Admin users cannot create, edit, or delete Super Admin users.
+- Company Admin users cannot delete themselves.
+- Company staff creation must set `users.company_id` to the authenticated user's company.
+- Staff roles must be assigned through the existing `user_roles` pivot.
+- Staff branch assignment uses `user_roles.branch_id`.
+- Only one role and one branch assignment are supported per staff user for now.
+- `/admin/users` routes require `auth`, `verified`, and `role:Super Admin`.
+- Super Admin users can view and manage users across companies.
+- Super Admin users can create platform Super Admin users with `company_id = null`.
+- Non-Super Admin users created through `/admin/users` require a company.
+- Branch assignment through `/admin/users` must belong to the selected company.
+- The last Super Admin user cannot be deleted.
+- Inactive users must be blocked from logging in.
+- Staff and platform user deletes use soft deletes.

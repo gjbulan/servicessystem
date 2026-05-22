@@ -30,3 +30,12 @@
 - Added `InventoryTransactionHistoryTest` coverage for the stock-in history fix.
 - `php artisan test --filter=InventoryTransactionHistoryTest` passed with 1 test.
 - `php artisan test` passed with 39 tests.
+
+## 2026-05-22 Phase 3.5
+
+- Fixed the authentication flow so inactive users cannot log in even with valid credentials.
+- Added staff/user soft deletes so removed users no longer appear in normal staff and platform user lists.
+- Updated profile account deletion coverage to assert soft deletes instead of hard deletes.
+- Added `StaffUserManagementTest` coverage for inactive login blocking.
+- `php artisan test --filter=StaffUserManagementTest` passed with 8 tests.
+- `php artisan test` passed with 58 tests.

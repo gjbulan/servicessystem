@@ -20,6 +20,7 @@ The Breeze `users` table now also has:
 
 - `company_id` nullable foreign key to `companies.id`, nulls on company delete
 - `status` string, default `active`, indexed
+- `deleted_at` for soft deletes
 
 ### `roles`
 
@@ -55,7 +56,7 @@ The Breeze `users` table now also has:
 - `branch_id` nullable unsigned big integer, indexed
 - unique index on `user_id`, `role_id`, `branch_id`
 
-`branch_id` is a role scope placeholder for future branch assignment rules. The Phase 2 `branches` table now exists, but user branch assignment workflows are not built yet.
+`branch_id` stores the single branch assignment used by Phase 3.5 staff management. Multiple branch assignment is not supported yet.
 
 ### `company_modules`
 
@@ -339,3 +340,27 @@ Sale item snapshots preserve item and pricing details even if catalog records ch
 - `created_at`, `updated_at`
 
 Paid sales create `inventory_transactions` rows with `transaction_type = sale`, negative quantities, `reference_type = Sale`, and `reference_id` set to the sale ID.
+
+## Phase 3.5 Staff & User Management
+
+Phase 3.5 adds no new staff tables.
+
+Database changes:
+
+- `users.deleted_at` was added for soft deletes.
+
+Existing tables used:
+
+- `users`
+- `roles`
+- `user_roles`
+- `branches`
+- `companies`
+
+Staff role and branch assignment:
+
+- `user_roles.role_id` stores the selected role.
+- `user_roles.branch_id` stores one optional branch assignment.
+- Company staff management supports only one role and one branch assignment per user for now.
+
+Soft-deleted users are excluded from normal staff and platform user lists.

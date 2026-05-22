@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 3 is in progress as the sales and invoicing core on top of the completed SaaS, company, and inventory foundations. The completed foundation includes:
+Phase 3.5 is in progress as staff and user management on top of the completed SaaS, inventory, and sales foundations. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -24,6 +24,8 @@ Phase 3 is in progress as the sales and invoicing core on top of the completed S
 - Branch stock and inventory transactions.
 - Optional inventory variant mode.
 - Sales, sale items, payments, and receipt/invoice printing.
+- Company staff management.
+- Platform user management.
 
 ## Implemented Application Areas
 
@@ -112,6 +114,20 @@ Phase 3 adds tenant sales records and payment handling.
 - `/sales/{sale}/print` provides a print-friendly receipt/invoice page.
 
 Phase 3 does not create a separate invoices table yet.
+
+## Phase 3.5 Staff & User Management
+
+Phase 3.5 adds staff management for tenant companies and platform-level user management for Super Admin users.
+
+- Company users with `manage_users` can manage staff through `/staff`.
+- Company staff queries are scoped to the authenticated user's `company_id`.
+- Company Admin users cannot assign or manage Super Admin users.
+- Staff users are assigned one role and one optional branch through `user_roles`.
+- Super Admin users manage platform users through `/admin/users`.
+- Super Admin users can create platform Super Admins with `company_id = null`.
+- Users now soft delete through `users.deleted_at`.
+- Inactive users are blocked from logging in.
+- Dashboard cards show staff totals for company users and platform user totals for Super Admin users.
 
 The following modules remain intentionally out of scope:
 
