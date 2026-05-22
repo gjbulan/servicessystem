@@ -98,6 +98,8 @@ Default module keys:
 - A company has many item brands.
 - A company has many items.
 - A company has many item variants.
+- A company has many expense categories.
+- A company has many expenses.
 - A company has many sales.
 - A company has many service categories.
 - A company has many services.
@@ -119,6 +121,7 @@ Default module keys:
 - A branch belongs to one company.
 - A branch has many branch item variant stocks.
 - A branch has many inventory transactions.
+- A branch has many expenses.
 - A branch has many sales.
 - A branch has many bookings.
 - A branch has many job orders.
@@ -145,6 +148,8 @@ Default module keys:
 - A branch item variant stock belongs to one company, branch, and item variant.
 - An inventory transaction belongs to one company, branch, item variant, and creator user.
 - A company inventory setting belongs to one company.
+- An expense category belongs to one company and has many expenses.
+- An expense belongs to one company, optional branch, optional expense category, and optional creator user.
 - A sale belongs to one company, branch, customer, and creator user.
 - A sale has many sale items and sale payments.
 - A sale item belongs to one company, sale, and item variant.
@@ -602,3 +607,38 @@ One service history record is generated when a job order is completed.
 - indexes on company/status, company/technician, company/branch, and company/created date
 
 Incentives are generated when a job order is completed, only when the `technician_incentives` module is enabled. Each assigned Technician user receives one incentive per completed job order service. Existing incentive rows for the job order prevent duplicate generation.
+
+## Phase 5 Accounting Lite
+
+### `expense_categories`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `name`
+- `description` nullable
+- `status` string: `active` or `inactive`; default `active`
+- `sort_order` nullable
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- index on `company_id`, `status`
+
+Expense categories are tenant-defined labels such as Salary, Rent, Electricity, Internet, Marketing, Fuel, Supplies, and Miscellaneous.
+
+### `expenses`
+
+- `id`
+- `company_id` foreign key to `companies.id`, cascades on hard delete
+- `branch_id` nullable foreign key to `branches.id`, nulls on delete
+- `expense_category_id` nullable foreign key to `expense_categories.id`, nulls on delete
+- `expense_date`
+- `reference_number` nullable
+- `description`
+- `amount` decimal(12,2)
+- `attachment_path` nullable
+- `status` string: `recorded` or `void`; default `recorded`
+- `created_by` nullable foreign key to `users.id`, nulls on delete
+- `created_at`, `updated_at`
+- `deleted_at` for soft deletes
+- indexes on company/date, company/status, company/branch, and company/category
+
+Only `recorded` expenses affect Accounting Lite reports. `void` expenses remain stored but are excluded from totals.

@@ -10,6 +10,7 @@
         ['module' => 'technician_incentives', 'label' => __('Technician Incentives'), 'route' => 'technician-incentives.index', 'enabled' => $canAccessTechnicianIncentives],
         ['module' => 'inventory', 'label' => __('Inventory'), 'route' => 'inventory.index', 'permission' => null],
         ['module' => 'sales', 'label' => __('Sales'), 'route' => 'sales.index', 'permission' => 'manage_sales'],
+        ['module' => 'accounting', 'label' => __('Accounting'), 'route' => 'reports.financial-summary', 'permission' => null],
         ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index', 'permission' => null],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && (($link['enabled'] ?? null) || ($navigationUser?->canAccessModule($link['module']) && (! ($link['permission'] ?? null) || $navigationUser?->hasPermission($link['permission'])))));
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
@@ -34,6 +35,11 @@
         ['label' => __('Bookings'), 'route' => 'bookings.index', 'active' => 'bookings.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('bookings') && $navigationUser?->hasPermission('manage_bookings')],
         ['label' => __('Job Orders'), 'route' => 'job-orders.index', 'active' => 'job-orders.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('job_orders') && $navigationUser?->hasPermission('manage_job_orders')],
         ['label' => __('Technician Incentives'), 'route' => 'technician-incentives.index', 'active' => 'technician-incentives.*', 'enabled' => $canUseTenantModules && $canAccessTechnicianIncentives],
+        ['label' => __('Expense Categories'), 'route' => 'expense-categories.index', 'active' => 'expense-categories.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('accounting')],
+        ['label' => __('Expenses'), 'route' => 'expenses.index', 'active' => 'expenses.*', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('accounting')],
+        ['label' => __('Financial Summary'), 'route' => 'reports.financial-summary', 'active' => 'reports.financial-summary', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('accounting')],
+        ['label' => __('Income Statement'), 'route' => 'reports.income-statement', 'active' => 'reports.income-statement', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('accounting')],
+        ['label' => __('Branch Profitability'), 'route' => 'reports.branch-profitability', 'active' => 'reports.branch-profitability', 'enabled' => $canUseTenantModules && $navigationUser?->canAccessModule('accounting')],
     ])->filter(fn ($link) => $link['enabled'] && \Illuminate\Support\Facades\Route::has($link['route']));
 @endphp
 

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Accounting\AccountingReportController;
+use App\Http\Controllers\Accounting\ExpenseCategoryController;
+use App\Http\Controllers\Accounting\ExpenseController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BookingController;
@@ -157,6 +160,21 @@ Route::middleware(['auth', 'verified', 'company.access'])->group(function () {
             Route::get('/{sale}', [SaleController::class, 'show'])->name('show');
             Route::get('/{sale}/edit', [SaleController::class, 'edit'])->name('edit');
             Route::match(['put', 'patch'], '/{sale}', [SaleController::class, 'update'])->name('update');
+        });
+
+    Route::middleware('module:accounting')
+        ->group(function () {
+            Route::resource('expense-categories', ExpenseCategoryController::class)
+                ->parameters(['expense-categories' => 'expenseCategory']);
+            Route::resource('expenses', ExpenseController::class);
+
+            Route::prefix('reports')
+                ->name('reports.')
+                ->group(function () {
+                    Route::get('/financial-summary', [AccountingReportController::class, 'financialSummary'])->name('financial-summary');
+                    Route::get('/income-statement', [AccountingReportController::class, 'incomeStatement'])->name('income-statement');
+                    Route::get('/branch-profitability', [AccountingReportController::class, 'branchProfitability'])->name('branch-profitability');
+                });
         });
 });
 

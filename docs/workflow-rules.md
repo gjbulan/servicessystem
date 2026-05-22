@@ -36,6 +36,8 @@ Phase 4 may build asset types, customer assets, service categories, services, pu
 
 Phase 4.5 may build technician incentive defaults, incentive generation from completed job order services, incentive overrides, approval, paid marking, simple incentive lists, and dashboard totals. It must not build accounting, payroll, purchase orders, subscriptions, percentage incentives, or advanced reports.
 
+Phase 5 may build expense categories, expenses, Accounting Lite reports, financial summary, income statement, branch profitability, and outstanding sales balance summaries. It must not build a general ledger, journal entries, bank reconciliation, payroll, tax filing, purchase orders, subscriptions, or a full accounting system.
+
 ## Phase 1 Access Workflow
 
 - Use `company.access` on future tenant routes that must require an active user and active/trial company.
@@ -178,3 +180,24 @@ Phase 4.5 may build technician incentive defaults, incentive generation from com
 - `final_amount` equals `override_amount` when present, otherwise `default_amount`.
 - Cancelled incentives are excluded from unpaid dashboard totals by summing only pending and approved statuses.
 - Dashboard incentive totals remain simple: pending, approved unpaid, and paid this month.
+
+## Phase 5 Accounting Lite Workflow
+
+- Accounting Lite routes require `auth`, `verified`, `company.access`, and `module:accounting`.
+- Every expense and report query must filter by the authenticated user's `company_id`.
+- Expense categories are tenant-scoped and soft deleted.
+- Expenses are tenant-scoped and soft deleted.
+- Expenses may optionally belong to a branch and category.
+- Expense branch and category inputs must belong to the authenticated user's company.
+- Only expenses with `status = recorded` affect reports.
+- Void expenses remain visible in CRUD but do not affect totals.
+- Expense attachments are optional and no approval workflow is built in Phase 5.
+- Recognized revenue comes from paid sales only, using `sales.status = paid` and `sales.total`.
+- Unpaid and partial sales do not count as revenue; their `balance_due` values appear in outstanding balances.
+- COGS comes from paid sale item snapshots: `sale_items.cost_price_snapshot * sale_items.quantity`.
+- Completed job order service prices are excluded from Phase 5 revenue to avoid double counting if service work is converted to a sale or invoice later.
+- Paid technician incentives are included separately as an operating expense line using `technician_incentives.final_amount`.
+- Technician incentives are not converted into payroll.
+- Branch profitability includes branch-assigned sales, expenses, and paid incentives only.
+- Company-wide expenses without a branch are included in company reports but are not allocated across branches in Phase 5.
+- Accounting navigation links render only when the accounting module is enabled.

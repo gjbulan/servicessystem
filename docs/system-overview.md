@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 4.5 adds technician incentives on top of the completed SaaS, inventory, sales, user management, and service operations foundations. The completed foundation includes:
+Phase 5 adds Accounting Lite on top of the completed SaaS, inventory, sales, user management, service operations, and technician incentive foundations. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -31,6 +31,7 @@ Phase 4.5 adds technician incentives on top of the completed SaaS, inventory, sa
 - Public booking and booking management.
 - Job orders with multiple technicians, services, items, stock usage, and service history.
 - Technician incentives generated from completed job order services.
+- Expense categories, expenses, and Accounting Lite financial reports.
 
 ## Implemented Application Areas
 
@@ -162,9 +163,22 @@ Phase 4.5 tracks technician incentives without adding payroll or accounting.
 - Technician users can view only their own incentive records.
 - Dashboard cards show pending, approved unpaid, and paid-this-month totals.
 
+## Phase 5 Accounting Lite
+
+Phase 5 provides basic financial visibility without a full ERP accounting system.
+
+- Expense categories organize tenant operating expenses.
+- Expenses can be recorded as company-wide or assigned to a branch.
+- Optional receipt attachments can be uploaded with expenses.
+- Financial Summary shows paid-sales revenue, COGS, gross profit, operating expenses, paid technician incentives, net profit, outstanding balances, and record counts.
+- Income Statement shows the same core financial lines in statement format.
+- Branch Profitability compares revenue, COGS, expenses, paid incentives, and net profit by branch.
+- Revenue is recognized from paid sales only.
+- Completed job order service prices are excluded from revenue in Phase 5 to avoid double counting.
+- Accounting routes and navigation are controlled by the `accounting` company module.
+
 The following modules remain intentionally out of scope:
 
 - Purchase orders.
-- Accounting.
 - Subscriptions.
 - Advanced reports.

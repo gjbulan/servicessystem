@@ -79,6 +79,16 @@ class Company extends Model
         return $this->hasMany(ItemVariant::class);
     }
 
+    public function expenseCategories(): HasMany
+    {
+        return $this->hasMany(ExpenseCategory::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);

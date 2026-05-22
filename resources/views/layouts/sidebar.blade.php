@@ -14,6 +14,13 @@
     $salesLinks = collect([
         ['label' => __('Sales'), 'route' => 'sales.index', 'active' => 'sales.*'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('sales') && $sidebarUser->hasPermission('manage_sales'));
+    $accountingLinks = collect([
+        ['label' => __('Expense Categories'), 'route' => 'expense-categories.index', 'active' => 'expense-categories.*'],
+        ['label' => __('Expenses'), 'route' => 'expenses.index', 'active' => 'expenses.*'],
+        ['label' => __('Financial Summary'), 'route' => 'reports.financial-summary', 'active' => 'reports.financial-summary'],
+        ['label' => __('Income Statement'), 'route' => 'reports.income-statement', 'active' => 'reports.income-statement'],
+        ['label' => __('Branch Profitability'), 'route' => 'reports.branch-profitability', 'active' => 'reports.branch-profitability'],
+    ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('accounting'));
     $serviceLinks = collect([
         ['label' => __('Asset Types'), 'route' => 'asset-types.index', 'active' => 'asset-types.*'],
         ['label' => __('Customer Assets'), 'route' => 'customer-assets.index', 'active' => 'customer-assets.*'],
@@ -42,7 +49,7 @@
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $canUseCompanyModules && $sidebarUser->canAccessModule('inventory') && $sidebarUser->hasPermission('manage_inventory') && (! ($link['requires_variants'] ?? false) || $usesItemVariants));
 @endphp
 
-@if ($staffLinks->isNotEmpty() || $branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $serviceLinks->isNotEmpty() || $bookingLinks->isNotEmpty() || $jobOrderLinks->isNotEmpty() || $incentiveLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
+@if ($staffLinks->isNotEmpty() || $branchLinks->isNotEmpty() || $salesLinks->isNotEmpty() || $accountingLinks->isNotEmpty() || $serviceLinks->isNotEmpty() || $bookingLinks->isNotEmpty() || $jobOrderLinks->isNotEmpty() || $incentiveLinks->isNotEmpty() || $customerLinks->isNotEmpty() || $inventoryLinks->isNotEmpty())
     <aside class="hidden w-64 shrink-0 border-r border-gray-200 bg-white lg:block">
         <div class="sticky top-0 space-y-6 p-6">
             @if ($branchLinks->isNotEmpty())
@@ -73,6 +80,17 @@
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Sales') }}</p>
                     <div class="mt-3 space-y-1">
                         @foreach ($salesLinks as $link)
+                            <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
+                        @endforeach
+                    </div>
+                </nav>
+            @endif
+
+            @if ($accountingLinks->isNotEmpty())
+                <nav>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">{{ __('Accounting') }}</p>
+                    <div class="mt-3 space-y-1">
+                        @foreach ($accountingLinks as $link)
                             <a href="{{ route($link['route']) }}" class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs($link['active']) ? 'bg-gray-100 text-gray-950' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-950' }}">{{ $link['label'] }}</a>
                         @endforeach
                     </div>

@@ -38,6 +38,11 @@ class Branch extends Model
         return $this->hasMany(InventoryTransaction::class);
     }
 
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);

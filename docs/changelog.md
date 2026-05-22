@@ -129,3 +129,16 @@
 - Fixed navigation module-link filtering so entries controlled by an explicit `enabled` flag do not require a `permission` key.
 - Ran Laravel Pint successfully.
 - Ran `php artisan test`: 73 tests passed.
+- Added Phase 5 Accounting Lite.
+- Added `expense_categories` and `expenses` migration.
+- Added `ExpenseCategory` and `Expense` models and relationships on companies, branches, and users.
+- Added expense category CRUD routes, controller, and Blade views.
+- Added expense CRUD routes, controller, filters, optional branch/category assignment, and optional receipt attachment upload.
+- Added Accounting Lite report routes for Financial Summary, Income Statement, and Branch Profitability.
+- Added paid-sales-only revenue logic, paid sale item COGS, recorded expense totals, outstanding unpaid/partial balances, and paid technician incentive totals.
+- Documented the Phase 5 limitation that completed job order service prices are excluded from revenue to avoid double counting.
+- Added accounting navigation and sidebar links hidden behind the `accounting` module.
+- Added `AccountingLiteTest` coverage for expense CRUD, tenant safety, paid-sales-only revenue, outstanding balances, COGS, technician incentives, module blocking, and report isolation.
+- Ran `php artisan test --filter=AccountingLiteTest`: 9 tests passed.
+- Ran Laravel Pint successfully.
+- Ran `php artisan test`: 82 tests passed.

@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->hasMany(JobOrder::class, 'created_by');
     }
 
+    public function createdExpenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'created_by');
+    }
+
     public function jobOrderTechnicianAssignments(): HasMany
     {
         return $this->hasMany(JobOrderTechnician::class, 'technician_id');
