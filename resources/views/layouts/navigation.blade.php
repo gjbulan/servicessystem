@@ -8,6 +8,7 @@
         ['module' => 'invoices', 'label' => __('Invoices'), 'route' => 'invoices.index'],
     ])->filter(fn ($link) => \Illuminate\Support\Facades\Route::has($link['route']) && $navigationUser?->canAccessModule($link['module']));
     $canManageModuleSettings = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_settings'));
+    $canManageCompanies = $navigationUser && ($navigationUser->isSuperAdmin() || $navigationUser->hasPermission('manage_companies'));
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
@@ -27,6 +28,12 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @if ($canManageCompanies)
+                        <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                            {{ __('Companies') }}
+                        </x-nav-link>
+                    @endif
 
                     @foreach ($moduleNavigationLinks as $moduleLink)
                         <x-nav-link :href="route($moduleLink['route'])" :active="request()->routeIs($moduleLink['route'])">
@@ -94,6 +101,12 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @if ($canManageCompanies)
+                <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                    {{ __('Companies') }}
+                </x-responsive-nav-link>
+            @endif
 
             @foreach ($moduleNavigationLinks as $moduleLink)
                 <x-responsive-nav-link :href="route($moduleLink['route'])" :active="request()->routeIs($moduleLink['route'])">

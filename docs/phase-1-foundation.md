@@ -32,6 +32,21 @@ Added foundation support:
 - Default module seeder for existing companies.
 - Navigation helper logic for future module links.
 
+## Phase 1.6 Extension
+
+Phase 1.6 extends the foundation with Super Admin company management. It does not implement tenant business modules.
+
+Added foundation support:
+
+- `/admin/companies` CRUD.
+- Company create/edit/show/index Blade views.
+- Company soft delete from the admin UI.
+- User-company assignment screen.
+- Demo Motoshop company seeding.
+- Demo Admin company user seeding.
+- Super Admin Companies navigation link.
+- Platform dashboard totals for Super Admin users.
+
 ## Files Created
 
 - `app/Http/Controllers/DashboardController.php`
@@ -47,6 +62,7 @@ Added foundation support:
 - `database/migrations/2026_05_21_000004_create_role_and_user_pivots.php`
 - `database/seeders/SaasFoundationSeeder.php`
 - Phase 1.5 files are listed in `docs/phase-1-5-module-toggles.md`.
+- Phase 1.6 files are listed in `docs/phase-1-6-company-management.md`.
 
 ## Files Changed
 
@@ -57,6 +73,7 @@ Added foundation support:
 - `routes/web.php`
 - `docs/*`
 - Phase 1.5 updates are listed in `docs/phase-1-5-module-toggles.md`.
+- Phase 1.6 updates are listed in `docs/phase-1-6-company-management.md`.
 
 ## Middleware Added
 
@@ -69,12 +86,15 @@ Added foundation support:
 
 - `/dashboard` now uses `DashboardController` instead of an inline closure.
 - `/settings/modules` manages company module toggles.
+- `/admin/companies` manages tenant companies.
+- `/admin/companies/{company}/users` assigns existing users to companies.
 
 ## Seeders Added
 
 - `SaasFoundationSeeder` creates default permissions, system roles, and role-permission assignments.
 - `DatabaseSeeder` calls `SaasFoundationSeeder` and creates or updates `test@example.com` as a Super Admin test user.
 - `DatabaseSeeder` now also calls `CompanyModuleSeeder`.
+- `DatabaseSeeder` now creates Demo Motoshop and `admin@demo.com` as a Company Admin.
 
 ## Default System Roles
 
@@ -108,3 +128,5 @@ Added foundation support:
 - Subscriptions.
 
 Phase 1.5 also keeps these out of scope as business modules. Their module keys may exist as toggles, but their workflows and screens are not implemented yet.
+
+Phase 1.6 keeps branches, customers, inventory, sales, invoices, bookings, job orders, and subscriptions out of scope.

@@ -17,27 +17,28 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user()->loadMissing(['company.modules', 'roles']);
+        $isPlatformAdmin = $user->company_id === null && $user->isSuperAdmin();
 
         $foundationStats = [
             [
                 'label' => 'Companies',
                 'value' => Company::count(),
-                'description' => 'Tenant records available',
+                'description' => $isPlatformAdmin ? 'Total tenant companies' : 'Tenant records available',
             ],
             [
-                'label' => 'System roles',
-                'value' => Role::system()->count().' / 6',
-                'description' => 'Default role catalog',
+                'label' => 'Module records',
+                'value' => CompanyModule::count(),
+                'description' => 'Company module toggles',
+            ],
+            [
+                'label' => 'Roles',
+                'value' => Role::count(),
+                'description' => 'RBAC role records',
             ],
             [
                 'label' => 'Permissions',
-                'value' => Permission::count().' / 11',
-                'description' => 'Default permission catalog',
-            ],
-            [
-                'label' => 'Module toggles',
-                'value' => CompanyModule::count(),
-                'description' => 'Company module records',
+                'value' => Permission::count(),
+                'description' => 'RBAC permission records',
             ],
             [
                 'label' => 'Middleware',
@@ -48,6 +49,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'foundationStats' => $foundationStats,
+            'isPlatformAdmin' => $isPlatformAdmin,
             'user' => $user,
         ]);
     }

@@ -133,6 +133,15 @@ Future module links render only when:
 
 No actual module routes were added for inventory, sales, invoices, bookings, services, or job orders.
 
+## Phase 1.6 Integration
+
+Company management reuses `Company::ensureDefaultModules()` when Super Admin users create or update a company.
+
+The Demo Motoshop seed company receives the same default module records:
+
+- Enabled: `customers`, `inventory`, `sales`, `invoices`, `reports`, `services`, `bookings`, `job_orders`, `technician_incentives`
+- Disabled: `accounting`, `purchase_orders`, `stock_transfers`
+
 ## Verification
 
 - `php artisan test --filter=CompanyModuleTest`: 5 tests passed.

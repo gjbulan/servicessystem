@@ -96,3 +96,14 @@ Default module keys:
 - A role belongs to many permissions through `role_permissions`.
 - A permission belongs to many roles through `role_permissions`.
 - A company module belongs to one company.
+
+## Phase 1.6 Company Management
+
+Phase 1.6 adds no new database tables. It uses:
+
+- `companies` for tenant CRUD.
+- `company_modules` for automatically created default module toggles.
+- `users.company_id` and `users.status` for assigning existing users to companies.
+- `user_roles` for the seeded Demo Admin `Company Admin` role assignment.
+
+Company records are soft deleted through `companies.deleted_at`.

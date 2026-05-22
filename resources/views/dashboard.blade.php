@@ -62,25 +62,40 @@
                             @endforelse
                         </div>
 
-                        <div class="mt-6 border-t border-gray-200 pt-6">
-                            <h3 class="text-lg font-semibold text-gray-900">{{ __('Enabled modules') }}</h3>
+                        @if ($isPlatformAdmin)
+                            <div class="mt-6 border-t border-gray-200 pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900">{{ __('Platform access') }}</h3>
 
-                            <div class="mt-4 flex flex-wrap gap-2">
-                                @forelse ($user->company?->modules?->where('is_enabled', true)->sortBy('module_name') ?? collect() as $module)
-                                    <span class="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
-                                        {{ $module->module_name }}
-                                    </span>
-                                @empty
-                                    <p class="text-sm text-gray-500">{{ __('No company modules assigned') }}</p>
-                                @endforelse
+                                <div class="mt-4 space-y-3 text-sm text-gray-600">
+                                    <p>{{ __('Super Admin users manage tenant companies and platform foundation settings.') }}</p>
+                                    <a href="{{ route('admin.companies.index') }}" class="inline-flex font-medium text-gray-900 hover:text-gray-700">
+                                        {{ __('Manage companies') }}
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="mt-6 border-t border-gray-200 pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900">{{ __('Enabled modules') }}</h3>
+
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    @forelse ($user->company?->modules?->where('is_enabled', true)->sortBy('module_name') ?? collect() as $module)
+                                        <span class="inline-flex items-center rounded-md bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800">
+                                            {{ $module->module_name }}
+                                        </span>
+                                    @empty
+                                        <p class="text-sm text-gray-500">{{ __('No company modules assigned') }}</p>
+                                    @endforelse
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <div class="bg-white shadow-sm sm:rounded-lg lg:col-span-2">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ __('SaaS foundation status') }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            {{ $isPlatformAdmin ? __('Platform foundation status') : __('Company foundation status') }}
+                        </h3>
 
                         <div class="mt-4 grid gap-4 sm:grid-cols-2">
                             @foreach ($foundationStats as $stat)

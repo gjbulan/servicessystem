@@ -43,6 +43,17 @@ Business examples:
 - Motoshop: `services`, `bookings`, and `job_orders` enabled.
 - Solar company: `inventory`, `sales`, and `invoices` enabled, with `bookings` disabled.
 
+## Phase 1.6 Company Management
+
+Phase 1.6 adds Super Admin tenant company management before Phase 2 business modules are built.
+
+- Super Admin users can create, view, update, and soft-delete companies.
+- Company slugs auto-generate from the company name when left blank.
+- New companies receive default module records through `Company::ensureDefaultModules()`.
+- Super Admin users can assign existing users to a company and set user status.
+- The database seeder creates Demo Motoshop and a Demo Admin user without removing the existing Super Admin account.
+- Company management is protected by the `manage_companies` permission path, with Super Admin bypass support from the existing permission middleware.
+
 The following modules are intentionally out of scope for Phase 1:
 
 - Bookings.

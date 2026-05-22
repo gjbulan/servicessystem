@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\CompanyModuleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -25,6 +26,15 @@ Route::middleware(['auth', 'verified', 'company.access', 'permission:manage_sett
     ->group(function () {
         Route::get('/modules', [CompanyModuleController::class, 'index'])->name('modules.index');
         Route::patch('/modules/{companyModule}', [CompanyModuleController::class, 'update'])->name('modules.update');
+    });
+
+Route::middleware(['auth', 'verified', 'permission:manage_companies'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/companies/{company}/users', [AdminCompanyController::class, 'users'])->name('companies.users');
+        Route::post('/companies/{company}/users/assign', [AdminCompanyController::class, 'assignUser'])->name('companies.users.assign');
+        Route::resource('companies', AdminCompanyController::class);
     });
 
 require __DIR__.'/auth.php';
