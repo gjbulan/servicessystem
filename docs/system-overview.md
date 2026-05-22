@@ -6,7 +6,7 @@ MOTOSHOP-SAAS is a Laravel 12 multi-tenant SaaS platform that can support motosh
 
 ## Current Phase
 
-Phase 1 is implemented as the SaaS foundation:
+Phase 2 is in progress as the business core foundation. The completed foundation includes:
 
 - Company tenant records.
 - User-to-company ownership.
@@ -16,6 +16,12 @@ Phase 1 is implemented as the SaaS foundation:
 - User-role assignments.
 - Access middleware for company, role, and permission checks.
 - Authenticated dashboard foundation summary.
+- Company module toggles.
+- Super Admin company management.
+- Branches.
+- Customers.
+- Inventory catalog foundation.
+- Branch stock and inventory transactions.
 
 ## Implemented Application Areas
 
@@ -24,7 +30,7 @@ Phase 1 is implemented as the SaaS foundation:
 - `Role` records can be system-level roles with `company_id` as `null`, or future company-owned roles.
 - `Permission` records define module/action access keys.
 - `role_permissions` assigns permissions to roles.
-- `user_roles` assigns roles to users with an optional `branch_id` placeholder for a later branch module.
+- `user_roles` assigns roles to users with an optional `branch_id` placeholder for future branch assignment rules.
 - Dashboard data is served through `DashboardController`.
 
 ## Phase 1.5 Module Toggles
@@ -37,6 +43,7 @@ Phase 1.5 adds company-level module toggles so each tenant can enable only the b
 - `User` can check module access through the assigned company.
 - Routes can use `module:module_key` middleware.
 - `/settings/modules` lets authorized users manage company module toggles.
+- Phase 2 inventory screens use module toggles to protect inventory catalog and stock-in routes.
 
 Business examples:
 
@@ -61,3 +68,28 @@ The following modules are intentionally out of scope for Phase 1:
 - Invoices.
 - Job orders.
 - Subscriptions.
+
+## Phase 2 Business Core
+
+Phase 2 adds tenant business records that can be reused by motoshops, inventory companies, retail stores, and hybrid businesses.
+
+- Branches are company-owned operating locations.
+- Customers belong to the company and are shared across branches.
+- Items are parent product records.
+- Item variants are the actual inventory units.
+- Branch stock is tracked per branch and variant.
+- Inventory transactions record every stock movement.
+- The stock-in page creates stock transactions and shows recent transaction history for the authenticated user's company.
+
+Phase 2 routes are tenant scoped by `company_id` and protected by the existing permission and module middleware.
+
+The following modules remain intentionally out of scope:
+
+- Sales/POS.
+- Invoices.
+- Services.
+- Bookings.
+- Job orders.
+- Technician incentives.
+- Purchase orders.
+- Accounting.

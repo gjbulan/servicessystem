@@ -20,3 +20,13 @@
 - `php artisan test` passed with 38 tests.
 - SQLite `migrate:fresh --seed` passed for Phase 1.6 seed data.
 - Local HTTP smoke check was blocked because MySQL on `127.0.0.1:3306` refused connections; start MySQL/XAMPP before manual browser testing.
+
+## 2026-05-22 Phase 2
+
+- Fixed the stock-in page so saved inventory transactions are visible after creation.
+- Added a tenant-scoped recent transaction history panel to `/inventory/stock-in`.
+- The history list filters by the authenticated user's `company_id` and sorts newest first.
+- The history displays date, branch, item, variant, SKU, transaction type, quantity, previous stock, new stock, notes, and creator.
+- Added `InventoryTransactionHistoryTest` coverage for the stock-in history fix.
+- `php artisan test --filter=InventoryTransactionHistoryTest` passed with 1 test.
+- `php artisan test` passed with 39 tests.
